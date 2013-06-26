@@ -1,5 +1,4 @@
 
-
 ############################################################################################################
 
 CRISP: Comprehensive Read Analysis for Identification of SNVs (and short indels) from Pooled sequencing data
@@ -76,21 +75,33 @@ Description of fields
 =====================
 
 NP: Number of Pools With Data
+
 VP: Number of Pools with variant allele(s)
+
 DP: Total number of reads (+strand,-strand) across all pools (filtered reads only)
+
 CT: contingency table p-value for each variant allele in same order as listed in column 5
+
 QVpf (QVpr): quality values based p-value for each variant allele using forward(reverse) strand reads
+
 MQ: number of reads with mapping qualities <10 | 10-19 |  20-39 |  >=40
+
 VT: variant type, SNV | DELETION | INSERTION
+
 HP: length in the ambiguity of positioning of indels (homopolymer length or microsatellite length)
+
 FLANKSEQ: This represents the reference haplotype sequence (length spans the homopolymer or microsatellite tract) with 10 bases either side of the variant position (10bases_upstream:reference_haplotype_sequence:10bases_downstream). This is useful to eyeball indels that occur in long homopolymer or microsatellite tracts.
 
 SB: variant demonstrates strand bias
+
 PASS: variant passes all filters
 
 GT: unphased genotype (currently set to 0/0 for all pools), this will be changed in future releases
+
 AF: frequency of variant alleles(s) in the pool in order listed in column 5
+
 ADf: Number of reads aligned to the forward strand of the genome supporting reference allele and the alternate alleles in the order listed
+
 ADr: Number of reads aligned to the reverse strand of the genome supporting reference allele and the alternate alleles in the order listed
 
 Please note that some of these fields may be removed/updated in future releases.
