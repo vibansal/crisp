@@ -1,0 +1,19 @@
+REQUIREMENTS
+=============
+
+CRISP requires the SAMtools package (http://samtools.sourceforge.net/) to read BAM files.
+
+
+HOW TO COMPILE THE CODE
+========================
+
+1. Download the SAMtools package from sourceforge: http://sourceforge.net/projects/samtools/files/samtools/0.1.18/
+
+2. Unzip files in the directory 'samtools' and run 'make' in the 'samtools' directory
+
+3. Download the CRISP source code to create the CRISP directory
+
+4. Modify the Makefile in the CRISP directory to point to the location of the 'samtools' directory
+
+5. run 'make all' to create the CRISP executable
+
