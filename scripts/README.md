@@ -6,10 +6,10 @@ calling programs. All these programs take as input a VCF and output summary stat
 2. calculate fraction of indels in homopolymer runs...
 3. for pooled sequencing: # of singletons in each pool 
 
-
-4. merge multi-base SNPs (MNPs) and complex variants into a single variant (using proximity and genotype analysis)
-4.1 split tri-allelic variants into multiple variants for ease of annotation and rare variant association testing 
-5. convert CRISP VCF (with allele counts) into standard VCF for pooled samples (0/0/0/0/0/0/0/1/1/1) 
+## variant post-processing
+merge multi-base SNPs (MNPs) and complex variants into a single variant (using proximity and genotype analysis)
+split tri-allelic variants into multiple variants for ease of annotation and rare variant association testing 
+convert CRISP VCF (with allele counts) into standard VCF for pooled samples (0/0/0/0/0/0/0/1/1/1) 
 
 
 6. identify regions with clusters of variants in low-complexity sequence 
