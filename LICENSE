@@ -1,9 +1,7 @@
 copyright (c) 2010-2014 Vikas Bansal, vibansal@ucsd.edu
 
-This program is distributed as an implementation of the CRISP method for academic research.
-It may not be redistributed in any form, without prior permission from the author.
-Permission is granted to modify the code for your own personal use, but modified versions
-must retain this copyright notice and must not be distributed.
+This program is distributed as an implementation of the CRISP method. Permission is granted to modify the code for your own personal use, but modified versions
+must retain this copyright notice and may not be distributed.
 
 This code is distributed without any guarantees about its correctness or accuracy. Please use
 it at your own risk.
