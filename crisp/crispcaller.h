@@ -15,7 +15,11 @@ extern double thresh1,MINQpv,thresh3,SER,RELAX;  //three pvalue thresholds
 extern int MAXITER; // max number of permutations
 extern int MINPOS, MAXPOS, MIN_READS;
 extern int USE_BASE_QVS; // default set to 1, if set to 0, use empirical error rates even for SNP calling
+<<<<<<< HEAD
 extern int OUTPUTGENOTYPES; 
+=======
+extern int OUTPUTGENOTYPES;
+>>>>>>> 37e9e8777118153d67e6bdc29f90cbde3dd15849
 //extern int CHISQ_PERMUTATION;
 
 int newCRISPcaller(REFLIST* reflist,int current,int position,READQUEUE* bq,struct BAMFILE_data* bd,struct VARIANT* variant,ALLELE* maxvec,FILE* vfile);
