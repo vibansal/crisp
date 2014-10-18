@@ -6,7 +6,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include<ctype.h>
-#include "../readfasta.h"
+#include "readfasta.h"
 #include "variant.h"
 
 //extern int USE_QV, QVset; // added dec 21 2011 to allow for weighted table use in chi-square calculation

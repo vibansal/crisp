@@ -8,7 +8,7 @@
 #include<string.h>
 #include<ctype.h>
 #include "sam.h" // samtools header file for bam definitions
-#include "../readfasta.h"
+#include "readfasta.h"
 #include "bamread.h"
 
 #define BAM_PAIRED_READ1 (BAM_FPAIRED | BAM_FPROPER_PAIR | BAM_FREAD1)

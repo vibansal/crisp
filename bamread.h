@@ -8,7 +8,7 @@
 #include<string.h>
 #include<ctype.h>
 #include "sam.h" // samtools header file for bam definitions
-#include "../readfasta.h"
+#include "readfasta.h"
 
 extern char INT_CIGAROP[];
 extern int SOLID;
