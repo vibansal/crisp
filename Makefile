@@ -21,7 +21,7 @@ crispindel: include/readfasta.o include/bamsreader.o include/variant.o include/a
 
 ## new version of CRISP that calls genotypes using likelihood and MLE method 
 all: include/readfasta.o include/bamsreader.o include/variant.o include/allelecounts.o include/chisquare.o include/contables.o include/newcrispcaller.o optionparser.c FET/lowcovFET.c include/bamread.o
-	$(CC) -DPICALL=3 -I$(SAMTOOLS) -g -O2 include/readfasta.o include/variant.o include/allelecounts.o include/bamsreader.o include/newcrispcaller.o include/chisquare.o include/contables.o include/bamread.o -lm readmultiplebams.c -o bin/CRISP-diploid -L$(SAMTOOLS) -lbam -lz
+	$(CC) -DPICALL=3 -I$(SAMTOOLS) -g -O2 include/readfasta.o include/variant.o include/allelecounts.o include/bamsreader.o include/newcrispcaller.o include/chisquare.o include/contables.o include/bamread.o -lm readmultiplebams.c -o bin/CRISP -L$(SAMTOOLS) -lbam -lz
 
 include/newcrispcaller.o:	crisp/newcrispcaller.c crisp/crispcaller.h FET/contables.h variant.h bamsreader.h bamread.h crisp/crispEM.c FET/pooledFET.c crisp/newcrispprint.c
 	$(CC) -I$(SAMTOOLS) -c crisp/newcrispcaller.c -o include/newcrispcaller.o
