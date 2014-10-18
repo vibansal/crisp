@@ -3,7 +3,8 @@
 char INT_CIGAROP[] = {'M','I','D','N','S','H','P','E','X'};
 
 int LEFT_ALIGN_INDELS =0;
-#include "../indels_shared/left_align_indels.c"
+#include "left_align_indels.c"
+//#include "../indels_shared/left_align_indels.c"
 
 // we can use MDstring or XM tag to speed up this function, no need of reference base checking but not big difference in speed compared to other parts of code
 int parse_cigar(struct alignedread* read,REFLIST* reflist,int current,int* fcigarlist)
