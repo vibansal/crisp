@@ -24,17 +24,17 @@ int update_error_table(REFLIST* reflist,int current,int position,READQUEUE* bq,s
                 for (j=0;j<4;j++) bd[i].counts[index_rev][3-j] += variant->indcounts[i][j+maxalleles];
                 //for (j=0;j<4;j++) bd[i].counts[index_rev][3-j+4] += variant->indcounts[i][j+maxalleles]; 
         }
-        if (positions_processed%20000 ==0 && positions_processed > 0)
+        if (positions_processed%10000 ==0 && positions_processed > 0)
         {
-                for (i=0;i<variant->samples;i++)
+                for (k=0;k<64;k++)
                 {
-                        for (k=0;k<64;k++)
+                	for (i=0;i<variant->samples;i++)
                         {
                                 s = bd[i].counts[k][0]+bd[i].counts[k][1]+bd[i].counts[k][2]+bd[i].counts[k][3];
-				fprintf(stdout,"%c%c ",variant->itb[(k%16)%4][0],variant->itb[(k%16)/4][0]);
-                                fprintf(stdout,"%0.6f %0.6f %0.6f %0.6f %d | ",(float)bd[i].counts[k][0]/s,(float)bd[i].counts[k][1]/s,(float)bd[i].counts[k][2]/s,(float)bd[i].counts[k][3]/s,(int)s);
+                                fprintf(stdout,"%0.6f %0.6f %0.6f %0.6f %d ",(float)bd[i].counts[k][0]/s,(float)bd[i].counts[k][1]/s,(float)bd[i].counts[k][2]/s,(float)bd[i].counts[k][3]/s,(int)s);
                                 //fprintf(stdout,"%d,%d,%d,%d  %d,%d,%d,%d | ",bd[i].counts[k][0],bd[i].counts[k][1],bd[i].counts[k][2],bd[i].counts[k][3],bd[i].counts[k][4],bd[i].counts[k][5],bd[i].counts[k][6],bd[i].counts[k][7]);
-                                if (k%16 ==15) fprintf(stdout,"ES:%d base %s\n ",i,variant->itb[k/16]);
+                                fprintf(stdout,"ES:%d base %s flanking %d proc:%d\n ",i,variant->itb[k/16],k%16,positions_processed);
+                                //if (k%16 ==15) fprintf(stdout,"ES:%d base %s\n ",i,variant->itb[k/16]);
                         }
                 }
         }
@@ -95,7 +95,7 @@ int jointvariantcaller(REFLIST* reflist,int current,int position,READQUEUE* bq,s
 		if (PFLAG >=1) fprintf(stdout,"\n"); 
 		if (lowcoverage != 5 && variant->refb != 'N') 
 		{
-			update_error_table(reflist,current,position,bq,bamfiles_data,variant);
+			//update_error_table(reflist,current,position,bq,bamfiles_data,variant);
 			positions_processed++; 
 		}
 		free(maxvec); 
@@ -114,8 +114,9 @@ int jointvariantcaller(REFLIST* reflist,int current,int position,READQUEUE* bq,s
 		#elif PICALL ==3 // this is the new CRISP method that can estimate allele counts/genotypes
 			v = newCRISPcaller(reflist,current,position,bq,bamfiles_data,variant,maxvec,options->vfile);
 			VARIANTS_CALLED += v; 
-			if (v ==0) 
+			if (v ==0 && CALCULATE_ERROR_RATES==1) 
 			{
+				//fprintf(stderr,"updating error table\n");
 				update_error_table(reflist,current,position,bq,bamfiles_data,variant);
 	                        positions_processed++;
 			}

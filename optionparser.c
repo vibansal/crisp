@@ -69,6 +69,7 @@ int parse_arguments(int argc,char* argv[],struct OPTIONS* options,char* bamfilep
 		else if (strcmp(argv[i],"--refbias") ==0) AGILENT_REF_BIAS = atof(argv[i+1]); 
 		else if (strcmp(argv[i],"--useduplicates") ==0) USE_DUPLICATES = atoi(argv[i+1]); 
 		else if (strcmp(argv[i],"--fastfilter") ==0) FAST_FILTER = atoi(argv[i+1]); 
+		else if (strcmp(argv[i],"--sse") ==0) CALCULATE_ERROR_RATES = atoi(argv[i+1]);  // allele counts for each sample to calculate context specific error rates 
 
 		else
 		{

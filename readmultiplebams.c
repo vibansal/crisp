@@ -48,6 +48,8 @@ int MIN_COVERAGE_POOL=1, MIN_COVERAGE_FLANKING=0,HAPLOTYPES=0; // min. average c
 int CALL_VARIANTS = 1;
 int ALLOW_AMBIGUOUS_BASES = 0;
 
+int CALCULATE_ERROR_RATES = 0;
+
 #include "optionparser.c"
 
 //  maintain for each pool: pointer to first (and last) read in shared queue, can be easily updated
