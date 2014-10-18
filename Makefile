@@ -31,20 +31,20 @@ include/newcrispcaller.o:	crisp/newcrispcaller.c crisp/crispcaller.h FET/contabl
 
 ### shared objects ### 
 
-include/variant.o: variant.c variant.h bamsreader.h bamsreader.c ../readfasta.h ../readfasta.c process_indel_variant.c
+include/variant.o: variant.c variant.h bamsreader.h bamsreader.c readfasta.h readfasta.c process_indel_variant.c
 	$(CC) -I$(SAMTOOLS) -c variant.c -o include/variant.o
 
 include/bamsreader.o: ../readfasta.h ../readfasta.c bamsreader.h bamsreader.c bamread.h bamread.c
 	$(CC) -I$(SAMTOOLS) -c bamsreader.c -o include/bamsreader.o
 
-include/bamread.o: ../readfasta.h ../readfasta.c bamread.h bamread.c 
+include/bamread.o: ../readfasta.h readfasta.c bamread.h bamread.c 
 	$(CC) -I$(SAMTOOLS) -c bamread.c -o include/bamread.o
 
-include/allelecounts.o: ../readfasta.h allelecounts.h allelecounts.c variant.h
+include/allelecounts.o: readfasta.h allelecounts.h allelecounts.c variant.h
 	$(CC) -I$(SAMTOOLS) -c allelecounts.c -o include/allelecounts.o
 
-include/readfasta.o: ../readfasta.c ../readfasta.h 
-	$(CC) -c ../readfasta.c -o include/readfasta.o
+include/readfasta.o: readfasta.c readfasta.h 
+	$(CC) -c readfasta.c -o include/readfasta.o
 
 include/chisquare.o: FET/chisquare.h FET/chisquare.c
 	$(CC) -I$(SAMTOOLS) -c FET/chisquare.c -o include/chisquare.o  
