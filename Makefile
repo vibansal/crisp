@@ -5,8 +5,6 @@ CFLAGS= -D_GNU_SOURCE -O2 -Wall -std=gnu99 -std=c99 -lm
 ## modify this variable to point to the location of the samtools directory in order to compile CRISP 
 SAMTOOLS=/home/vikas/Public/WorkingProjects/samtools-0.1.18
 
-all:
-	crispdip
 
 ## this is the older version of CRISP that does not call genotypes 
 crisp: include/readfasta.o include/bamsreader.o include/variant.o include/allelecounts.o include/chisquare.o include/contables.o include/crispcaller.o include/bamread.o optionparser.c
@@ -23,7 +21,7 @@ crispindel: include/readfasta.o include/bamsreader.o include/variant.o include/a
 
 
 ## new version of CRISP that calls genotypes using likelihood and MLE method 
-crispdip: include/readfasta.o include/bamsreader.o include/variant.o include/allelecounts.o include/chisquare.o include/contables.o include/newcrispcaller.o optionparser.c FET/lowcovFET.c include/bamread.o
+all: include/readfasta.o include/bamsreader.o include/variant.o include/allelecounts.o include/chisquare.o include/contables.o include/newcrispcaller.o optionparser.c FET/lowcovFET.c include/bamread.o
 	$(CC) -DPICALL=3 -I$(SAMTOOLS) -g -O2 include/readfasta.o include/variant.o include/allelecounts.o include/bamsreader.o include/newcrispcaller.o include/chisquare.o include/contables.o include/bamread.o -lm readmultiplebams.c -o bin/CRISP-diploid -L$(SAMTOOLS) -lbam -lz
 
 include/newcrispcaller.o:	crisp/newcrispcaller.c crisp/crispcaller.h FET/contables.h variant.h bamsreader.h bamread.h crisp/crispEM.c FET/pooledFET.c crisp/newcrispprint.c
