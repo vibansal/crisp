@@ -3,8 +3,7 @@ CC=gcc -Wall -D_GNU_SOURCE
 CFLAGS= -D_GNU_SOURCE -O2 -Wall -std=gnu99 -std=c99 -lm
 
 ## modify this variable to point to the location of the samtools directory in order to compile CRISP 
-SAMTOOLS=/home/vikas/Public/WorkingProjects/samtools-0.1.18
-
+SAMTOOLS=/home/vbansal//CODE/JOINTCODE-coral/samtools
 
 ## this is the older version of CRISP that does not call genotypes 
 crisp: include/readfasta.o include/bamsreader.o include/variant.o include/allelecounts.o include/chisquare.o include/contables.o include/crispcaller.o include/bamread.o optionparser.c
