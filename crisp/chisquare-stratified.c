@@ -3,6 +3,8 @@
 #include<math.h>
 #include<stdlib.h>
 
+#define LOG10 2.302585092994046
+
 // this code analyzes bidirectional allele counts as separate bin in chi-square calculation
 // strata has information about samples sequenced on same run/platform etc (0,1,2,3), added nov 16 2012 
 // we should stratify by read 1/2 for Illumina data in addition to strand 
@@ -65,7 +67,7 @@ int chi2pvalue_stratified(struct VARIANT* variant,int allele1,int allele2,int al
 	//if (computechi2 ==1 && statisticjoint > 0) *chisqpvalue = gammq( (double)(DOF-1)/2,statisticjoint/2); else *chisqpvalue = 0;
 	SF = statisticjoint[0]; 
 	RUGF = kf_gammaq( (double)(DOF-1)/2,(double)SF/2);
-	if (SF > 0) pvalue[2] = RUGF/log(10); else pvalue[2] = 0; *chisqpvalue = pvalue[2];
+	if (SF > 0) pvalue[2] = RUGF/LOG10; else pvalue[2] = 0; *chisqpvalue = pvalue[2];
 	chistat[0] = statisticjoint[0];  
 	chistat[1] = statisticf[0]; chistat[2] = statisticr[0];  chistat[3] = statnew[0]; chistat[4] = pairwisestat[0];
 
@@ -165,7 +167,7 @@ int chi2pvalue_stratified_pivotsample(struct VARIANT* variant,int allele1,int al
 	//if (computechi2 ==1 && statisticjoint > 0) *chisqpvalue = gammq( (double)(DOF-1)/2,statisticjoint/2); else *chisqpvalue = 0;
 	SF = statisticjoint[0] + statisticjoint[1]; 
 	RUGF = kf_gammaq( (double)(DOF-1)/2,(double)SF/2);
-	if (SF > 0) pvalue[2] = RUGF/log(10); else pvalue[2] = 0; *chisqpvalue = pvalue[2];
+	if (SF > 0) pvalue[2] = RUGF/LOG10; else pvalue[2] = 0; *chisqpvalue = pvalue[2];
 	chistat[0] = statisticjoint[0]+statisticjoint[1]; 
 	chistat[1] = statisticf[0]+statisticf[1]; chistat[2] = statisticr[0]+statisticr[1]; 
 	chistat[3] = statnew[0]+statnew[1]; chistat[4] = pairwisestat[0]+pairwisestat[1];
@@ -174,9 +176,9 @@ int chi2pvalue_stratified_pivotsample(struct VARIANT* variant,int allele1,int al
 	{
 		fprintf(stdout,"chi2 %0.2f:%.2f ",SF,pvalue[2]);//,statnew,chi2pvr);
 		RUGF = kf_gammaq( (double)(DOF1-1)/2,(double)statisticjoint[0]/2);
-		if (statisticjoint[0] > DOF1-1) pvalue[0] = RUGF/log(10); else pvalue[0] = 0;
+		if (statisticjoint[0] > DOF1-1) pvalue[0] = RUGF/LOG10; else pvalue[0] = 0;
 		RUGF = kf_gammaq( (double)(DOF2-1)/2,(double)statisticjoint[1]/2);
-		if (statisticjoint[1] > DOF2-1) pvalue[1] = RUGF/log(10); else pvalue[1] = 0;
+		if (statisticjoint[1] > DOF2-1) pvalue[1] = RUGF/LOG10; else pvalue[1] = 0;
 		fprintf(stdout,"%d:%0.2f:%.2f %d:%0.2f:%.2f ",DOF1,statisticjoint[0],pvalue[0],DOF2,statisticjoint[1],pvalue[1]);
 		if (pvalue[0] < pvalue[2] && pvalue[0] < pvalue[1]) 
 		{

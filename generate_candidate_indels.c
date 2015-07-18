@@ -145,7 +145,7 @@ int extract_indel_reads(struct alignedread* read,REFLIST* reflist,int current,in
         for (i=0;i<read->fcigs;i++)
         {
                 op = read->fcigarlist[i]&0xf; l = read->fcigarlist[i]>>4;
-                if (op == BAM_CMATCH) { l1 += l; l2 += l; }
+                if (op == BAM_CMATCH || op == 7) { l1 += l; l2 += l; }
                 else if (op == 8) 
 		{
 			//addElement(heap,read->position+l2,0,read->flag & 16);
@@ -157,7 +157,7 @@ int extract_indel_reads(struct alignedread* read,REFLIST* reflist,int current,in
 			addElement(heap,read->position+l2,-1*l,read->flag & 16); indel_added++;
                         l2 += l;
                 }
-                else if (op == BAM_CINS)
+                else if (op == BAM_CINS) // only add insertions that are not too close to end of read
                 {
                         flag =0;
                         if ((i ==1 && (read->fcigarlist[0]>>4) < 5) || (i ==read->fcigs-2 && (read->fcigarlist[read->fcigs-1]>>4) < 5) ) flag = 1;

@@ -33,11 +33,14 @@ unsigned int BTI[] = {
 
 void print_read(struct alignedread* bcall, struct alignedread* bcall_mate,int j)
 {
+	fprintf(stdout,"OPE_INDEL | ");
 	int i=0;
-	for (i=0;i<bcall->cigs;i++) fprintf(stdout,"%d%c",bcall->cigarlist[i]>>4,INT_CIGAROP[bcall->cigarlist[i]&0xf]); 
+	for (i=0;i<bcall->fcigs;i++) fprintf(stdout,"%d%c",bcall->fcigarlist[i]>>4,INT_CIGAROP[bcall->fcigarlist[i]&0xf]); 
 	fprintf(stdout," ");
-   	for (i=0;i<bcall_mate->cigs;i++) fprintf(stdout,"%d%c",bcall_mate->cigarlist[i]>>4,INT_CIGAROP[bcall_mate->cigarlist[i]&0xf]); 
-	fprintf(stdout," %d read %s %d %c %s %s\n",j+1,bcall->readid,bcall->position,bcall_mate->sequence[bcall_mate->l1+bcall_mate->delta],bcall->sequence,bcall_mate->sequence);
+   	for (i=0;i<bcall_mate->fcigs;i++) fprintf(stdout,"%d%c",bcall_mate->fcigarlist[i]>>4,INT_CIGAROP[bcall_mate->fcigarlist[i]&0xf]); 
+	fprintf(stdout," | %s %d \nread %s %d OPE_INDEL\n",bcall->readid,bcall->IS,bcall->sequence,bcall->position);
+	for (i=0;i<bcall_mate->position-bcall->position;i++) fprintf(stdout,"."); 
+	fprintf(stdout,"mate %s %d OPE_INDEL\n",bcall_mate->sequence,bcall_mate->position);
 }
 
 // advance read function should be changed to call in an interval (start-end) and a set of haplotypes | return haplotype that the read matches....
@@ -59,7 +62,7 @@ int advance_read(struct alignedread* bcall,struct VARIANT* variant)
 	while (bcall->l2 <= variant->position && bcall->cigoffset < bcall->fcigs)
 	{
 		op = bcall->fcigarlist[bcall->cigoffset]&0xf; l = bcall->fcigarlist[bcall->cigoffset]>>4;
-		if (op == BAM_CDIFF)
+		if (op == BAM_CDIFF) // single base mismatch 
 		{
 			if (bcall->l2 == variant->position)
 			{
@@ -136,7 +139,7 @@ int evaluate_OPE_readpair(struct alignedread* bcall, struct alignedread* bcall_m
 	int matefound = 0; int quality_m=0;	OPE_OPS=0;
 
 	if (bcall->matepair != NULL && (bcall->matepair)->position == bcall->mateposition) bcall_mate = bcall->matepair; 
-	else  // try to find the mate in linked list
+	else  // try to find the mate by moving in linked list
 	{
 		bcall_mate = bcall->nextread;
 		while (bcall_mate != NULL && bcall->mateposition >= bcall_mate->position) 
@@ -159,7 +162,7 @@ int evaluate_OPE_readpair(struct alignedread* bcall, struct alignedread* bcall_m
 	if  (advance_read(bcall_mate,variant) ==0) bcall_mate->filter = '1'; 
 	else if (bcall->type != bcall_mate->type)   // one of them is indel and not same as other one
 	{
-		//print_read(bcall,bcall_mate,j);
+		if (OVERLAPPING_PE_READS ==2 && bcall->IS > 100) print_read(bcall,bcall_mate,0); // last arg is sample-id  05/07/2015 remove comment to print such reads 
 		// this may happen if one end is not aligned with indel while other end is ?? 
 		// we need to decide if we want to filter all such pairs or not ??
 		// indel position ambiguity needs to be accounted for 
@@ -268,7 +271,7 @@ void calculate_allelecounts(REFLIST* reflist,int current,READQUEUE* bq,struct BA
 			if ((bcall->IS > 0 && bcall->lastpos_mate > 0 && variant->position >= bcall->lastpos_mate) || (bcall->IS < 0 &&  variant->position < bcall->mateposition)) bcall->filter = '1';
 
 			// calculation of OPE for indel reads does not account for ambiguous reads marked as reference !!
-			if (OVERLAPPING_PE_READS ==1 && bcall->position < bcall->mateposition && variant->position > bcall->mateposition && bcall->filter == '0' && ar ==1)
+			if (OVERLAPPING_PE_READS >=1 && bcall->position < bcall->mateposition && variant->position > bcall->mateposition && bcall->filter == '0' && ar ==1)
 			{
 				evaluate_OPE_readpair(bcall,bcall_mate,variant,&strand,&randomstrand,&quality);
 			}

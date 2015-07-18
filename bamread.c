@@ -1,6 +1,6 @@
 #include "bamread.h"
-// character array: 0->BAM_CMATCH, 1-> BAM_CINS .... 2 -> BAM_CDEL  3 -> BAM_CREF_SKIP 4 -> BAM_CSOFT_CLIP
-char INT_CIGAROP[] = {'M','I','D','N','S','H','P','E','X'};
+// character array: 0->BAM_CMATCH, 1-> BAM_CINS .... 2 -> BAM_CDEL  3 -> BAM_CREF_SKIP 4 -> BAM_CSOFT_CLIP, '5' = hard_clip, 6 = padding, '=' = 7 match | X = 8 mismatch 
+char INT_CIGAROP[] = {'M','I','D','N','S','H','P','=','X'};
 
 int LEFT_ALIGN_INDELS =0;
 #include "left_align_indels.c"
@@ -20,8 +20,9 @@ int parse_cigar(struct alignedread* read,REFLIST* reflist,int current,int* fciga
 		op = read->cigarlist[i]&0xf; l = read->cigarlist[i]>>4; 
 		//if ((i ==0 || i == read->cigs-1) && op == BAM_CINS) { read->cigarlist[i] += 3; op = BAM_CSOFT_CLIP; } 
 		// ignore hard clips as well (SOLID data can cause BUG)
-		if (op != BAM_CMATCH && op != BAM_CHARD_CLIP) fcigarlist[f++] = read->cigarlist[i];  // copy as it is 
-                if (op == BAM_CMATCH)
+		// edited 03/26/2015 to allow = and X cigar operations in original cigar string
+		if (op != BAM_CMATCH && op != BAM_CHARD_CLIP && op < 7) fcigarlist[f++] = read->cigarlist[i];  // copy as it is for some cigar operations
+                if (op == BAM_CMATCH || op >= 7) // this will work for 20= or 5X | 20= changed to 20M and 5X -> 1X 1X 1X 1X 1X 
 		{
 			m=0;
 			for (t=0;t<l;t++)
@@ -30,7 +31,8 @@ int parse_cigar(struct alignedread* read,REFLIST* reflist,int current,int* fciga
                                 if (read->sequence[l1+t]  != reflist->sequences[current][read->position+l2+t] && read->sequence[l1+t] != reflist->sequences[current][read->position+l2+t]-32 && read->sequence[l1+t]  !='N') 
 				{
 					read->mismatches++;
-					if (m > 0) fcigarlist[f++] = m<<4; fcigarlist[f++] = 24; m=0; // 24 = 1X in cigar code 
+					if (m > 0) fcigarlist[f++] = m<<4; // 'M' cigar, although it should be '=' to be technically correct 
+					fcigarlist[f++] = 24; m=0; // 24 = 1X in cigar code 
 					//if (m > 0) fcigarlist[f++] = m<<4; fcigarlist[f++] = (read->sequence[l1+t]<<4)+8; m=0;
 				}
 				else m++; 
@@ -41,7 +43,6 @@ int parse_cigar(struct alignedread* read,REFLIST* reflist,int current,int* fciga
 		}
 		else if (op == BAM_CDEL || op == BAM_CREF_SKIP) // allow 'N' in cigar  
 		{
-			
 			read->gaps++; l2 += l; read->lastpos += l; 
 		}
 		else if (op == BAM_CINS) 
@@ -92,8 +93,8 @@ struct alignedread* get_read_bamfile(const bam1_t *b, void *data,struct alignedr
 	read->strand = 0; if ((read->flag & 16) == 16) read->strand = 1; 
 	read->fcigs =0;
 
-	// ignore hard clip in read->cigarlist 
 	read->cigs = c->n_cigar; int s=0,e=c->n_cigar,i=0;
+	// ignore hard clip in read->cigarlist 
 	//if ((cigar[0]&0xf) == BAM_CHARD_CLIP) { read->cigs--; s++; }
 	//if ((cigar[c->n_cigar-1]&0xf) == BAM_CHARD_CLIP) { read->cigs--; e--; } 
 	read->cigarlist = calloc(read->cigs,sizeof(int));

@@ -60,14 +60,13 @@ int CALCULATE_ERROR_RATES = 0;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // multi sample variant caller: CRISP, PICALL or low coverage method
-int multisampleVC(struct OPTIONS* options,REFLIST* reflist)
+int multisampleVC(struct OPTIONS* options,REFLIST* reflist,FILE* fp)
 {
-	if (USE_DUPLICATES ==1) BAM_FILTER_MASK = (BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL);
-	else BAM_FILTER_MASK = (BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL | BAM_FDUP);
+	if (USE_DUPLICATES ==1) BAM_FILTER_MASK = (BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL); else BAM_FILTER_MASK = (BAM_FUNMAP | BAM_FSECONDARY | BAM_FQCFAIL | BAM_FDUP);
 
-	int bamfiles = options->bamfiles;int last=0; // last is the current position s.t. all reads have starting position > last
-	FILE* fp = fopen(reflist->fastafile,"r"); 
+	int bamfiles = options->bamfiles;
 
+	int last=0; // last is the current position s.t. all reads have starting position > last
 	int i=0; int h=0;
 	unsigned long reads=0; int j=0; int prev_tid = -1;   int rf=0;
 	int finishedfiles =0; 
@@ -77,14 +76,14 @@ int multisampleVC(struct OPTIONS* options,REFLIST* reflist)
 	READQUEUE* RQ = (READQUEUE*)malloc(sizeof(READQUEUE));  RQ->first = NULL; RQ->last = NULL; RQ->reads = 0; 
 	int* fcigarlist = (int*)malloc(sizeof(int)*4096);
 
+	// data structure for holding potential variants and read counts, etc 
 	struct VARIANT variant;  variant.ploidy = calloc(options->bamfiles,sizeof(int)); 
 	init_poolsizes(&variant,options,PICALL); 
 	init_variant(&variant,options->bamfiles,options->bamfiles);
 	variant.options = options;  // pointer to options
 
-	BAMHEAP bheap; bheap.harray = (int*)malloc(sizeof(int)*bamfiles); 
+	BAMHEAP bheap; bheap.harray = (int*)malloc(sizeof(int)*bamfiles); bheap.length = bamfiles;
 	for (i=0;i<bamfiles;i++) { bheap.harray[i] = i; bamfiles_data[i].finished= 0;}
-	bheap.length = bamfiles;
 	
 	reflist->cinterval = -1; // first interval to the right of current base
 
@@ -254,6 +253,7 @@ int main(int argc, char* argv[])
 
 	REFLIST reflist;
 	if (read_fastaheader(options->fastafile,&reflist) == -1)  return -1;  strcpy(reflist.fastafile,options->fastafile);
+	FILE* fp = fopen(options->fastafile,"r"); 
 
 	if (read_bedfile(options->bedfile,&reflist) != -1) targeted = 1; else  targeted = 0; 
 
@@ -269,8 +269,10 @@ int main(int argc, char* argv[])
 	}
 
 	if (options->bamfiles >=2) fprintf(stderr,"processing %d bamfiles: %s ..... %s \n\n",options->bamfiles,options->bamfilelist[0],options->bamfilelist[options->bamfiles-1]);
-	multisampleVC(options,&reflist);
-	if (vflag ==1) fclose(options->vfile); return 1;
+	multisampleVC(options,&reflist,fp);
+	if (vflag ==1) fclose(options->vfile); 
+	fclose(fp); // close pointer to fasta reference file 
+	return 1;
 
 }
 

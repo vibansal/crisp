@@ -103,7 +103,7 @@ int jointvariantcaller(REFLIST* reflist,int current,int position,READQUEUE* bq,s
 	}
 	else 
 	{
-		if (PFLAG >=1 && OVERLAPPING_PE_READS==1 && variant->counts[allele1+2*maxalleles]+variant->counts[allele2+2*maxalleles] > 0) fprintf(stdout," | OPE=%d:%d:%d ",variant->counts[allele1+2*maxalleles],variant->counts[allele2+2*maxalleles],variant->filteredreads[4]);
+		if (PFLAG >=1 && OVERLAPPING_PE_READS >=1 && variant->counts[allele1+2*maxalleles]+variant->counts[allele2+2*maxalleles] > 0) fprintf(stdout," | OPE=%d:%d:%d ",variant->counts[allele1+2*maxalleles],variant->counts[allele2+2*maxalleles],variant->filteredreads[4]);
 		else if (PFLAG >=1) fprintf(stdout," | ");
 		if (PFLAG>=1) fprintf(stdout,"\tMQ=%d,%d,%d,%d;FL=%d,%d;",variant->MQcounts[0],variant->MQcounts[1],variant->MQcounts[2],variant->MQcounts[3],variant->filteredreads[0],variant->filteredreads[1]);
 		//if (PFLAG >=1 && variant->filteredreads[2] > 0) fprintf(stdout,"OPE=%d,%d,%d,%d",variant->filteredreads[2],variant->filteredreads[3],variant->filteredreads[4],variant->filteredreads[5]);

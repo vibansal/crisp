@@ -8,6 +8,10 @@ int optparser(int argc, char* argv[],struct OPTIONS* options);
 int parse_arguments(int argc,char* argv[],struct OPTIONS* options,char* bamfilepaths,char* phenotypefile)
 {
 	int i=0,bamfiles=0;
+	// output command used to run  CRISP in stdout file 
+	fprintf(stdout,"##CRISP_command "); for (i=0;i<argc;i+=1)fprintf(stdout," %s",argv[i]); fprintf(stdout,"\n"); 
+
+	OUTPUT_ALLELE_COUNTS = NULL;
 	for (i=1;i<argc-1;i+=2)
 	{
 		if (strcmp(argv[i],"--ref") ==0 || strcmp(argv[i],"--reference") ==0)        strcpy(options->fastafile,argv[i+1]);
@@ -70,6 +74,7 @@ int parse_arguments(int argc,char* argv[],struct OPTIONS* options,char* bamfilep
 		else if (strcmp(argv[i],"--useduplicates") ==0) USE_DUPLICATES = atoi(argv[i+1]); 
 		else if (strcmp(argv[i],"--fastfilter") ==0) FAST_FILTER = atoi(argv[i+1]); 
 		else if (strcmp(argv[i],"--sse") ==0) CALCULATE_ERROR_RATES = atoi(argv[i+1]);  // allele counts for each sample to calculate context specific error rates 
+		else if (strcmp(argv[i],"--outputAC") ==0) OUTPUT_ALLELE_COUNTS = argv[i+1];  // allele counts for each sample at indel sites will be output to the file specified
 
 		else
 		{
@@ -95,7 +100,7 @@ int parse_arguments(int argc,char* argv[],struct OPTIONS* options,char* bamfilep
 				else fprintf(stderr,"unrecognized option.... %s %s \n",argv[i],argv[i+1]);
 			#endif
 
-			#if PICALL ==1
+			#if PICALL ==1  // not used anymore 
 				if (strcmp(argv[i],"--callsnps") ==0) INDELSONLY = 1-atoi(argv[i+1]);
 				else if (strcmp(argv[i],"--LLRthresh") ==0) LLRthresh = atof(argv[i+1]);
 				else if (strcmp(argv[i],"--HWE") ==0) 

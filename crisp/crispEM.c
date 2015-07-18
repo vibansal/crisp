@@ -300,10 +300,12 @@ double EMmethod(struct VARIANT* variant,int allele1, int allele2, int allele3,do
 		if (pnewf < MINP) pnewf= MINP; if (1.0-pnewf <=MINP) pnewf = 1.0-MINP;
 		if (pnewr < MINP) pnewr= MINP; if (1.0-pnewr <=MINP) pnewr = 1.0-MINP;
 		if (pnewb < MINP) pnewb= MINP; if (1.0-pnewb <=MINP) pnewb = 1.0-MINP;
-		if (iter >=2 && fabsf(LLtotal-LLtotalprev) <= 0.01 && fabsf(LLtotalf-LLtotalprevf) <= 0.01 && fabsf(LLtotalr-LLtotalprevr) <=0.01) exitloop = 1;
+		if (LLtotal < LLtotalprev && LLtotalprev < -1) fprintf(stdout,"LLdecrease! %f \n",LLtotalprev-LLtotal);
+		if (iter >=2 && fabsf(LLtotal-LLtotalprev) <= 0.0001 && fabsf(LLtotalf-LLtotalprevf) <= 0.01 && fabsf(LLtotalr-LLtotalprevr) <=0.01) exitloop = 1;
 		if (PFLAG >=1 && (iter < 10 || iter%20 ==0 || exitloop ==1) ) 
 		{
-			fprintf(stdout,"AF %0.6f %0.6f LLtotal %0.3f LLnull %0.2f %0.2f:%0.2f:%0.2f E01 %0.5f:%0.5f:%0.5f E10 %0.5f:%0.5f:%0.5f \n",p,pnew,LLtotal,LLnull,LLtotalf,LLtotalr,LLtotalb,E01[0],E01[1],E01[2],E10[0],E10[1],E10[2]);
+			fprintf(stdout,"AF %0.6f %0.6f LLtotal %0.6f LLnull %0.6f %0.2f:%0.2f:%0.2f E01 %0.5f:%0.5f:%0.5f E10 %0.5f:%0.5f:%0.5f \n",p,pnew,LLtotal,LLnull,LLtotalf,LLtotalr,LLtotalb,E01[0],E01[1],E01[2],E10[0],E10[1],E10[2]);
+			//fprintf(stdout,"AF %0.6f %0.6f LLtotal %0.3f LLnull %0.2f %0.2f:%0.2f:%0.2f E01 %0.5f:%0.5f:%0.5f E10 %0.5f:%0.5f:%0.5f \n",p,pnew,LLtotal,LLnull,LLtotalf,LLtotalr,LLtotalb,E01[0],E01[1],E01[2],E10[0],E10[1],E10[2]);
 			if (exitloop ==1) fprintf(stdout,"AF %0.6f %0.6f LLtotal %0.3f LLnull %0.2f %0.2f:%0.2f:%0.2f\n",p,pnew,LLtotalprev,LLnullprev,LLtotalprevf,LLtotalprevr,LLtotalprevb);
 			//fprintf(stdout,"T vals %f %f %f %f \n",T01[0],T00[0],T10[0],T11[0]);
 		}

@@ -129,13 +129,56 @@ int evaluate_variant(READQUEUE* bq, struct VARIANT* variant,int allele1,int alle
 }	
 
 
+// code added 03/26/2015 to output indel allele counts to text file, --EM 2 option has to be used 
+// also output SNP alleles, useful to see if some regions need haplotype analysis to examine combinations...
+void output_allele_counts(REFLIST* reflist,int current,struct VARIANT* variant,ALLELE* maxvec,char* vtype)
+{
+	FILE* vfile = stdout;
+	int allele=0,allele1 = maxvec[0].al, allele2 = maxvec[1].al, allele3 = maxvec[2].al, allele4=maxvec[3].al;
+	int i=0,j=0; int printhomseq =0;
+	for (j=1;j<4;j++)
+	{
+		allele = maxvec[j].al;
+		if (allele >=4 &&  variant->itb[allele][0] == '+' && variant->HPlength[allele] > printhomseq) printhomseq= variant->HPlength[allele];
+		else if (allele >=4 &&  variant->itb[allele][0] == '-' && (variant->HPlength[allele] + strlen(variant->itb[allele])-1 > printhomseq)) printhomseq= variant->HPlength[allele]+strlen(variant->itb[allele])-1;
+	}
+
+	// also print flanking sequence for indel allele 
+	fprintf(vfile,"\ncandidate %s %s %d ",vtype,variant->chrom,variant->position); 
+	for (j=0;j<4;j++)
+	{
+		allele = maxvec[j].al;
+		if (maxvec[j].ct < 3 && j > 0 ) continue; // ignore alleles with less than 3 reads 
+		fprintf(vfile,"%s ",variant->itb[allele]);
+	}
+	fprintf(vfile,"FLANKSEQ=");
+        for (j=-21;j<-1;j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
+        fprintf(vfile,":");
+        for (j=-1;j<printhomseq;j++) fprintf(vfile,"%c",toupper(reflist->sequences[current][variant->position+j]));
+        fprintf(vfile,":");
+        for (j=printhomseq;j<printhomseq+20;j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
+        fprintf(vfile,"\n");
+
+	for (j=0;j<4;j++)
+	{
+		allele = maxvec[j].al;
+		if (maxvec[j].ct < 3  && j > 0) continue; // ignore alleles with less than 3 reads but always print reference 
+		fprintf(vfile,"candidate "); //allele %s ",variant->itb[allele]);
+		for (i=0;i<variant->samples;i++)
+		{
+			fprintf(vfile,"%d,%d,%d ",variant->indcounts[i][allele],variant->indcounts[i][allele+maxalleles],variant->indcounts[i][allele+2*maxalleles]);
+		}
+		fprintf(vfile,"\n");
+	}
+}
 
 // aug 23 2012, return 0 -> no variant, 1 for SNP, 2 for indel, 3 for multi-allelic // maintain Ti/Tv ratio
 // function called in main for pooled variant calling
 int newCRISPcaller(REFLIST* reflist,int current,int position,READQUEUE* bq,struct BAMFILE_data* bd,struct VARIANT* variant,ALLELE* maxvec,FILE* vfile)
 {
 	int i=0,j=0,al=0,potentialvar=0,is_variant =0,variantpools=0;
-	int allele=0, allele1 = maxvec[0].al, allele2 = maxvec[1].al, allele3 = maxvec[2].al; double paf[2] = {0.0,0.0};
+	int allele=0, allele1 = maxvec[0].al, allele2 = maxvec[1].al, allele3 = maxvec[2].al, allele4=-1;
+	double paf[2] = {0.0,0.0};
 	int maxambiguity=0; int indelflag = 0;
 
 	for (al=1;al<=5;al++) 
@@ -149,6 +192,7 @@ int newCRISPcaller(REFLIST* reflist,int current,int position,READQUEUE* bq,struc
 	// we are removing ambigous bases even for SNP calling | BUG june 13 2013 
 	//if (maxambiguity >0 ) remove_ambiguous_bases(bq,variant,maxambiguity,1); // this function is called after allele counts are determined, OPE issue
 
+	int variant_output = 0;
 	variant->strandpass =0; variant->varalleles=0;
 	//need fast filtering function to evaluate potential alleles for being true variant 
 	for (al=1;al<=5;al++)
@@ -166,7 +210,7 @@ int newCRISPcaller(REFLIST* reflist,int current,int position,READQUEUE* bq,struc
 		potentialvar = evaluate_variant(bq,variant,allele1,allele2,allele3,paf); 
 		if (potentialvar ==1) 
 		{
-			if (EMflag ==1) 
+			if (EMflag >=1) 
 			{
 				is_variant = compute_GLL_pooled(bq,variant,allele1,allele2,allele3,paf);
 				if (is_variant ==1) 
@@ -178,16 +222,17 @@ int newCRISPcaller(REFLIST* reflist,int current,int position,READQUEUE* bq,struc
 					variant->nvariants[variant->varalleles] = variantpools; // use it to store # of pools that pass filter
 					variant->varalleles++;
 				}
+				if (EMflag >= 2 && allele2 >=4 && variant_output ==0) 
+				{
+					//fprintf(stdout,"indel candidate \n"); // this is an indel, we just print it to VCF  for realignment here 
+					output_allele_counts(reflist,current,variant,maxvec,"INDEL"); // added 03/26/2015
+					variant_output = 1; // only do it once per site
+				}
 			}
 			else if (EMflag ==0) // use old pooled variant calling method
 			{
 				is_variant =0; variantpools =0; 
 				is_variant = pooled_variantcaller(bq,bd,variant,allele1,allele2); 
-			}
-			else if (EMflag ==2 && allele2 >=4) 
-			{
-				is_variant =0; variant->varalleles =0;
-				//fprintf(stdout,"indel candidate \n"); // this is an indel, we just print it to VCF  for realignment here 
 			}
 		}
 		if (indelflag > 0) remove_ambiguous_bases(bq,variant,indelflag,-1); 
@@ -196,6 +241,8 @@ int newCRISPcaller(REFLIST* reflist,int current,int position,READQUEUE* bq,struc
 
 	if (variant->varalleles >= 1)  // print VCF variant for pooled sequencing
 	{
+		if (EMflag ==3 && variant_output ==0) output_allele_counts(reflist,current,variant,maxvec,"SNP");  // also do it for SNPs
+
 		// BUG here the allele counts will have been changed back to original count 07/02/13, run remove_ambiguous_bases again with max HP length
 		indelflag =0;
 		for (i=0;i<variant->varalleles;i++) 
