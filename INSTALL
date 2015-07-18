@@ -1,10 +1,24 @@
+
+
+
+HOW TO COMPILE THE CODE:
+=========================
+
+run 'make all' in main directory. It should compile 'samtools' and then the crisp code. The executable 'CRISP' will be created in the main directory. 
+
+
+
 REQUIREMENTS
 =============
 
 CRISP requires the SAMtools package (http://samtools.sourceforge.net/) to read BAM files.
 
 
-HOW TO COMPILE THE CODE
+
+
+
+
+HOW TO COMPILE THE CODE: old instructions
 ========================
 
 1. Download the SAMtools package from sourceforge: http://sourceforge.net/projects/samtools/files/samtools/0.1.18/
