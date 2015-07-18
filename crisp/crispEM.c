@@ -300,7 +300,7 @@ double EMmethod(struct VARIANT* variant,int allele1, int allele2, int allele3,do
 		if (pnewf < MINP) pnewf= MINP; if (1.0-pnewf <=MINP) pnewf = 1.0-MINP;
 		if (pnewr < MINP) pnewr= MINP; if (1.0-pnewr <=MINP) pnewr = 1.0-MINP;
 		if (pnewb < MINP) pnewb= MINP; if (1.0-pnewb <=MINP) pnewb = 1.0-MINP;
-		if (LLtotal < LLtotalprev && LLtotalprev < -1) fprintf(stdout,"LLdecrease! %f \n",LLtotalprev-LLtotal);
+		//if (LLtotal < LLtotalprev && LLtotalprev < -1) fprintf(stdout,"LLdecrease! %f \n",LLtotalprev-LLtotal);
 		if (iter >=2 && fabsf(LLtotal-LLtotalprev) <= 0.0001 && fabsf(LLtotalf-LLtotalprevf) <= 0.01 && fabsf(LLtotalr-LLtotalprevr) <=0.01) exitloop = 1;
 		if (PFLAG >=1 && (iter < 10 || iter%20 ==0 || exitloop ==1) ) 
 		{
