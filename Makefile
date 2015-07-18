@@ -8,6 +8,7 @@ SAMTOOLS=samtools
 ## new version of CRISP that calls genotypes using likelihood and MLE method 
 all: 
 	$(MAKE) -C samtools all 
+	mkdir -p include bin;
 	$(MAKE) -C . new 
 	#$(MAKE) -C . crisp
 	$(MAKE) -C . indel
@@ -55,4 +56,5 @@ include/contables.o: FET/contables.c FET/contables.h FET/chisquare.h FET/chisqua
 	$(CC) -c FET/contables.c -o include/contables.o
 
 clean:
-	rm -f include/*.o CRISP bin/CRISP 
+	rm -f include/*.o CRISP bin/CRISP*
+	rm -r include bin
