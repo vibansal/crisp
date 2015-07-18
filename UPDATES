@@ -1,0 +1,86 @@
+
+07/18/2015 
+
+refactoring of code and code for BAM file parsing pushed to 'parsebam' directory
+
+code can be compiled with single 'make all' command 
+
+
+03/26/2015 
+
+edited bamread.c to allow '=' and 'X' in original cigar string from bam file
+
+01/08/2014
+
+- changed definition of strand-bias calculation (probability of data if genotype is fixed to be reference for all samples on one strand)
+- removed log10 computation in crispEM code 
+- added option for variable pool sizes, "filename PS=40" per line in "--bams list_of_bam_files" 
+
+
+
+11/13/2013
+
+modified variant.c to handle allele counts for bases that span a deletion (after actual deletion position), previously these reads were being ignores (should be counted towards a separate allele), | modified advance_read to return value = 2 | artifically count these reads towards reference to avoid false variants ....
+
+
+11/6/13
+
+added --refbias (default = 0.5, 0.52 for agilent) to account for bias in agilent sureselect capture -> underestimation of allele frequencies compared to Sequenom
+
+--EM 1 is default 
+
+07/02/2013
+
+moved code to CRISP directory instead of BAMbased...
+
+06/30/2013
+
+bug in crisp causing segfault due to samples_to_bam ## commented out for now 
+## code written for mapping multiple bam files to same sample...
+
+
+June 7 2013
+
+calculation of OPE reads and removal of discordant reads (does not take into account that in one direction, the read may not span the entire indel) 
+
+
+June 4 2013
+
+implemented new EM algorithm for estimating error rate parameters for indels 
+
+===========================================================================================================================
+
+###Nov 22 2012####
+
+fixed overlapping-paired end read, reads shorter than read-length 
+
+use estimate of error rate from OPE reads to flag strand-bias positions...
+
+use joint-chisquare statistic for calculating p-value rather than current version of joint-statistic, takes care of strand-bias, 
+
+============================================Nov 20 2012=============================================
+
+faster and correct implementation of OPE read detection, could be even faster with priority queue implementation....
+
+Nov 16 2012 
+
+Oct 26 2012
+
+crispcaller.c is now designed for low-frequency variants (removed dependency on pool size, was not being used anyway)
+
+============================ Sept 27 2012 ============================================================
+
+CRISP updated to filter potential variants using estimate of allele counts (<0.5 filtered out) 
+this filter seems to work well in the sense that it does not throw out any real variants 
+
+additional filter: for low allele count -> calculate chi-square statistic and filter out if not significant ....
+
+if variant passes these filters -> call full ML algorithm....
+
+need to implement faster method for detecting overlapping PE-reads, removing it really speeds up CRISP 
+
+handle multi-allelic indels in single call rather than calling individual alleles
+
+
+
+
