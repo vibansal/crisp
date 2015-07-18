@@ -1,12 +1,12 @@
-#include "bamread.h"
-#include "bamsreader.h"
-#include "variant.h"
-#include "allelecounts.h"
+#include "parsebam/bamread.h"
+#include "parsebam/bamsreader.h"
+#include "parsebam/variant.h"
+#include "parsebam/allelecounts.h"
 #include "FET/contables.h"
 #include "crisp/crispcaller.h"
 
-#include "generate_candidate_indels.c"
-#include "realignment.c"
+#include "indels/generate_candidate_indels.c"
+#include "indels/realignment.c"
 
 // if this variable is set to 1, the bayesian-method is used for all variants SNPs/indels
 //#define PICALL 1, picall variable is actually passed to the program at compile time using -D option (0 for crisp, 2 for low coverage, 3 for BFGS based crisp)

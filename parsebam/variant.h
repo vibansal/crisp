@@ -6,7 +6,7 @@
 #include<string.h>
 #include<ctype.h>
 #include "bamsreader.h"
-#include "common.h"
+#include "../common.h"
 
 struct VCF_ALLELE
 {

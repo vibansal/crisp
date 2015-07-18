@@ -7,9 +7,9 @@
 #include<stdlib.h>
 #include<string.h>
 #include<ctype.h>
-#include "../variant.h"
-#include "../bamsreader.h"
-#include "../allelecounts.h"
+#include "variant.h"
+#include "bamsreader.h"
+#include "allelecounts.h"
 
 extern double thresh1,MINQpv,thresh3,SER,RELAX;  //three pvalue thresholds 
 extern int MAXITER; // max number of permutations

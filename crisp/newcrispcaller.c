@@ -8,7 +8,7 @@
 #include "crispcaller.h"
 #include "../FET/contables.h"
 #include "../FET/chisquare.h"
-#include "../allelecounts.h"
+#include "allelecounts.h"
 
 //#define MLMETHOD 1 // change this to 0 to disable EM method and optimizations.
 
