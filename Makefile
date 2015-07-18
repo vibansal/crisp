@@ -9,10 +9,12 @@ SAMTOOLS=samtools
 all: 
 	$(MAKE) -C samtools all 
 	$(MAKE) -C . new 
-	cp bin/CRISP .
+	#$(MAKE) -C . crisp
+	$(MAKE) -C . indel
+	cp bin/CRISP-genotypes CRISP
 
 new: include/readfasta.o include/bamsreader.o include/variant.o include/allelecounts.o include/chisquare.o include/contables.o include/newcrispcaller.o optionparser.c FET/lowcovFET.c include/bamread.o
-	$(CC) -DPICALL=3 -I$(SAMTOOLS) -g -O2 include/readfasta.o include/variant.o include/allelecounts.o include/bamsreader.o include/newcrispcaller.o include/chisquare.o include/contables.o include/bamread.o -lm readmultiplebams.c -o bin/CRISP -L$(SAMTOOLS) -lbam -lz
+	$(CC) -DPICALL=3 -I$(SAMTOOLS) -g -O2 include/readfasta.o include/variant.o include/allelecounts.o include/bamsreader.o include/newcrispcaller.o include/chisquare.o include/contables.o include/bamread.o -lm readmultiplebams.c -o bin/CRISP-genotypes -L$(SAMTOOLS) -lbam -lz
 	
 
 ## this is the older version of CRISP that does not call genotypes 
@@ -22,9 +24,8 @@ crisp: include/readfasta.o include/bamsreader.o include/variant.o include/allele
 include/crispcaller.o:	crisp/crispcaller.c crisp/crispcaller.h FET/contables.h variant.h bamsreader.h FET/pooledFET.c crisp/crispprint.c
 	$(CC) -I$(SAMTOOLS) -c crisp/crispcaller.c -o include/crispcaller.o
 
-
 ## picall replacement to call indels only 
-crispindel: include/readfasta.o include/bamsreader.o include/variant.o include/allelecounts.o include/chisquare.o include/contables.o include/newcrispcaller.o optionparser.c FET/lowcovFET.c include/bamread.o
+indel: include/readfasta.o include/bamsreader.o include/variant.o include/allelecounts.o include/chisquare.o include/contables.o include/newcrispcaller.o optionparser.c FET/lowcovFET.c include/bamread.o
 	$(CC) -DPICALL=3 -I$(SAMTOOLS) -g -O2 include/readfasta.o include/variant.o include/allelecounts.o include/bamsreader.o include/newcrispcaller.o include/chisquare.o include/contables.o include/bamread.o -lm readmultiplebams.c -o bin/CRISPindel -L$(SAMTOOLS) -lbam -lz
 
 ### shared objects ### 
