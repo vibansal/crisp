@@ -85,7 +85,3 @@ for line in File:
 
 File.close();
 
-
-# python convert_pooled_vcf.py /media/drive2/T2D-pooledseq-july2012/phase3-78pools/phase1.CRISP.vcf.annotated /media/drive2/T2D-pooledseq-july2012/phase1-190pools/plist.190pools 40 > 190pools.phase1.genotypes.vcf
-
-# python convert_pooled_vcf.py /media/drive2/T2D-pooledseq-july2012/phase3-78pools/VCFs/plist.68pools.VCF.080714 /media/drive2/T2D-pooledseq-july2012/phase3-78pools/VCFs/plist.68pools > 68pools.new.vcf
