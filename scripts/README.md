@@ -20,7 +20,9 @@ All these programs take as input a VCF and output summary statistics (and a new 
 ## TO BE ADDED SOON
 
 A. filter variants using LR statistic and chi-square table statistic (user-specified thresholds)
+
 B. INDELS: calculate fraction of indels in homopolymer runs and identify regions with clusters of variants in low-complexity sequence 
+
 C. identify somatic mutations in tumor-normal sequencing using list of tumor-normal pairs 
 
 D. split tri-allelic variants into multiple variants for ease of annotation and rare variant association testing
