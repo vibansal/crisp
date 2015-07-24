@@ -1,0 +1,1 @@
+../../python-NGS/annotation/Gene_mutation_analysis/read_fasta_bychrom.py
