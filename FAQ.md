@@ -1,6 +1,6 @@
 
 
-######## CRISP can run in two modes: --EM 0 and --EM 1 option #############
+######## CRISP can run in two modes: --EM 0 and --EM 1 option 
 
 --EM 1 corresponds to the new CRISP method that can estimate the 'discrete' pooled genotype for each pool
 and uses a likelihood ratio test (in addition to the contingency table analysis) to call variants. This is 
@@ -12,7 +12,7 @@ to identify variant sites and report allele frequencies for each pool. The ctpva
 thresholds are only used with EM = 0 option
 
 
-###### running CRISP on targeted sequencing experiments ######### 
+**running CRISP on targeted sequencing experiments_**
 
 It is recommended to specify a bedfile (--bed option) for targeted sequencing experiments. If a bedfile is 
 not specified, the program will evaluate each base for variant calling and the output file can be quite
