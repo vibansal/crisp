@@ -4,7 +4,8 @@
 HOW TO COMPILE THE CODE:
 =========================
 
-run 'make all' in main directory. It should compile 'samtools' and then the crisp code. The executable 'CRISP' will be created in the main directory. 
+run 'make all' in main directory. It should compile 'samtools' and then the crisp code. 
+The executable 'CRISP' will be created in the main directory. 
 
 
 

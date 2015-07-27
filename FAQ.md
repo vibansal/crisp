@@ -2,14 +2,14 @@
 
 ######## CRISP can run in two modes: --EM 0 and --EM 1 option #############
 
---EM 0 corresponds to the original CRISP method that uses the contingency table analysis and per pool filters
-to identify variant sites and report allele frequencies for each pool. The ctpval and qvpval 
-thresholds are only used with EM = 0 option
-
-
 --EM 1 corresponds to the new CRISP method that can estimate the 'discrete' pooled genotype for each pool
 and uses a likelihood ratio test (in addition to the contingency table analysis) to call variants. This is 
 recommended for artificial pooled sequencing studies. 
+
+
+--EM 0 corresponds to the original CRISP method that uses the contingency table analysis and per pool filters
+to identify variant sites and report allele frequencies for each pool. The ctpval and qvpval 
+thresholds are only used with EM = 0 option
 
 
 ###### running CRISP on targeted sequencing experiments ######### 

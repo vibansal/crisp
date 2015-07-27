@@ -1,3 +1,6 @@
+
+/* MAIN CODE for running CRISP */
+
 #include "parsebam/bamread.h"
 #include "parsebam/bamsreader.h"
 #include "parsebam/variant.h"

@@ -1,5 +1,5 @@
 
-/* code for parsing arguments from command line for CRISP 
+/* code for parsing arguments from command line for CRISP and for parsing the input file with information about BAM file and pool sizes 
  */
 
 //void init_parser(struct OPTIONS* options);
