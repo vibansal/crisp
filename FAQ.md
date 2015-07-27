@@ -5,11 +5,6 @@ The input file (--bams) to CRISP should specify the pool size (2 x number of ind
 
 pool1.bam PS=50
 
-....
-....
-
-pool10.bam PS=44
-
 
 **CRISP can run in two modes: --EM 0 and --EM 1 option**
 
