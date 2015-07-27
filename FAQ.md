@@ -1,6 +1,15 @@
 
+**CRISP can deal with variable pool sizes** 
 
-** CRISP can run in two modes: --EM 0 and --EM 1 option **
+The input file (--bams) to CRISP should specify the pool size (2 x number of individuals, assuming diploid genomes) on each line as follows: 
+
+pool1.bam PS=50
+....
+....
+pool10.bam PS=44
+
+
+**CRISP can run in two modes: --EM 0 and --EM 1 option**
 
 --EM 1 corresponds to the new CRISP method that can estimate the 'discrete' pooled genotype for each pool
 and uses a likelihood ratio test (in addition to the contingency table analysis) to call variants. This is 
@@ -33,14 +42,14 @@ indexed bam file named as pooln.bam.bai (pooln.bai will not work)
 the reads in the BAM files
 
 
-***calling of short insertions/deletions (indels) ***
+***calling of short insertions/deletions (indels)***
 
 CRISP can call short indels as well as SNVs. However, it is difficult to call multi-allelic indels (
 i.e. indels with multiple variant alleles) from pooled sequence data. For indel analysis, CRISP assumes that indels are left justified, 
 --leftalign 1 option can be used to left justify gaps in aligned reads
 
 
-*** Common sources of Errors while running CRISP ***
+***Common sources of Errors while running CRISP***
 
 If you get a segmentation fault while running CRISP, try to compile CRISP from the source code 
 on your system.
