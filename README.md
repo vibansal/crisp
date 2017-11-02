@@ -2,7 +2,7 @@
 
 CRISP: Comprehensive Read Analysis for Identification of SNVs (and short indels) from Pooled sequencing data
 
-Contact: Vikas Bansal, vbansal@scripps.edu
+Contact: Vikas Bansal, vibansal@ucsd.edu
 
 Citation: A statistical method for the detection of variants from next-generation resequencing of DNA pools, V. Bansal. Bioinformatics 26(12), 2010
 
