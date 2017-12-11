@@ -4,8 +4,11 @@
 The input file (--bams) to CRISP should specify the pool size (2 x number of individuals, assuming diploid genomes) on each line as follows: 
 
 pool1.bam PS=50
+
 pool2.bam PS=40
+
 ...
+
 pool20.bam PS=36
 
 
