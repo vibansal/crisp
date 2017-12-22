@@ -1,4 +1,4 @@
-############################################################################################################
+####################################################################################################
 
 CRISP: Comprehensive Read Analysis for Identification of SNVs (and short indels) from Pooled sequencing data
 
@@ -6,7 +6,7 @@ Contact: Vikas Bansal, vibansal@ucsd.edu
 
 Citation: A statistical method for the detection of variants from next-generation resequencing of DNA pools, V. Bansal. Bioinformatics 26(12), 2010
 
-############################################################################################################
+######################################################################################################
 
 Introduction:
 =============
@@ -17,7 +17,7 @@ CRISP is a software program to detect SNPs and short indels from pooled sequenci
 Implementation
 =============
 
-CRISP is implemented in C and uses the SAMtools API for reading BAM files. Currently, pre-compiled binaries for linux x86_64 platform are available for download. Source code will be released soon.
+CRISP is implemented in C and uses the SAMtools API for reading BAM files. 
 
 
 Running CRISP:
@@ -37,11 +37,14 @@ Important Notes:
 	(b) --bam: specify individual bam files on the command line 
 3. The reference sequence file should be indexed using 'samtools faidx' and the index file reference.fasta.fai placed in the same directory as reference.fasta
 4. For targeted sequencing studies, it is recommended to use a bed file for variant calling. If a bedfile is not specified, the program will evaluate each base in the genome for variant calling.
+
 4. CRISP requires at least two pools to make variant calls, but at least 5 pools are ideal. CRISP should be run separately on pools sequenced on different sequencing instruments.
-5. The number of haplotypes in each pool (--poolsize) is assumed to be the same, this will be changed in the next release
-6. The quality value offset needs to be set correctly: 33 for quality values encoded in Sanger format and 64 for Illumina 1.3+ format. Setting this value incorrectly can result in significant overcalling/undercalling of variants
-7. Increasing the number of permutations (from 20K to 50K-100K) can slightly improve the accuracy of variant detection at the cost of increasing running time. Choose this parameter based on the number of pools and the total target region sequenced.
-8. CRISP can be parallelized by calling variants on specific chromosomes (or regions) using the --regions option. This requires the bam files to be indexed. 
+
+5. The number of haplotypes in each pool (--poolsize) is assumed to be the same. For variable poolsizes, the poolsize should be specified inn the input file with the list of bam files (see FAQ for details on the format).
+
+6. Increasing the number of permutations (from 20K to 50K-100K) can slightly improve the accuracy of variant detection at the cost of increasing running time. Choose this parameter based on the number of pools and the total target region sequenced.
+
+7. CRISP can be parallelized by calling variants on specific chromosomes (or regions) using the --regions option. This requires the bam files to be indexed. 
 
 
 Command-line arguments for CRISP
@@ -68,7 +71,9 @@ Command-line arguments for CRISP
 Output VCF file:
 ================
 
-CRISP outputs the variants identified to a VCF file. For each variant, CRISP outputs the allele depth (read counts) for the reference and variant alleles at each poisition in the VCF file. This can be used for calculating allele frequencies or doing case-control association analysis. Currently, CRISP does not output genotypes for the pools. Multi-allelic variants and indels are also reported.
+CRISP outputs the variants identified to a VCF file. For each variant, CRISP outputs the allele depth (read counts) for the reference and variant alleles at each poisition in the VCF file. This can be used for calculating allele frequencies or doing case-control association analysis. Multi-allelic variants and indels are also reported.
+
+Update: the latest version of CRISP outputs genotypes for each pool (--EM 1, default) as allele counts. The CRISP VCF can be converted to a standard pooled genotype VCF using a script provided in the scripts sub-directory. 
 
 Description of fields
 =====================
@@ -86,7 +91,6 @@ FLANKSEQ: This represents the reference haplotype sequence (length spans the hom
 SB: variant demonstrates strand bias
 PASS: variant passes all filters 
 
-GT: unphased genotype (currently set to 0/0 for all pools), this will be changed in future releases
 AF: frequency of variant alleles(s) in the pool in order listed in column 5
 ADf: Number of reads aligned to the forward strand of the genome supporting reference allele and the alternate alleles in the order listed
 ADr: Number of reads aligned to the reverse strand of the genome supporting reference allele and the alternate alleles in the order listed
