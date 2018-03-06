@@ -2,7 +2,6 @@
 import sys, os, glob, string, subprocess,time, math, re, compiler
 
 ## coded july 15 2015, code to convert CRISP pooled allele count to genotype 0/0/0/0/0/1 format so that it is compatible with standard tools
-
 ## if the sum of allele counts is more than poolsize, program ignores that variant. 
 
 if len(sys.argv) < 3: 
@@ -26,14 +25,17 @@ print >>sys.stderr, "pool sizes:", pool_sizes; #sys.exit();
 
 variants=0; 
 File = open(sys.argv[1]); # pooled VCF file
- 
 for line in File:
-
 	if line[0] == '#': 
 		print line,
 		continue;
 
 	var = line.strip().split('\t'); chrom = var[0]; position = int(var[1]); alleles = var[4].split(',');
+	
+	## filter out multi-allelic indels
+	if len(alleles) >= 2 and (len(var[3]) != len(alleles[0]) or len(var[3]) != len(alleles[1])): 
+		print >>sys.stderr,"filtering multi-allelic indel",var[0:6];
+		continue;
 
 	valid_variant = 1;
 	GENOTYPES = []; 
@@ -68,8 +70,9 @@ for line in File:
 					for c in xrange(int(counts[a])):  GV.append(`(a)`); 
 				if len(GV) > pool_sizes[i-9]: 
 					valid_variant = 0; break; 
-					print >>sys.stderr, "poolsize is smaller than allele counts, please provide correct pool size, terminating program"; 
-					sys.exit();
+					print >>sys.stderr, "poolsize is smaller than allele counts, please provide correct pool size";
+					continue;
+					#sys.exit();
 			
 		#sys.stdout.write('\t' + '/'.join(GV) + ':' +  ':'.join(genotype[1:]));
 		GENOTYPES.append('/'.join(GV) + ':' +  ':'.join(genotype[1:]));
