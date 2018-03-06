@@ -18,6 +18,7 @@ void print_sampleids(struct OPTIONS* options)
 	}
 }
 
+// NP=10;DP=6381,4908,1591;VT=SNV;CT=-78.9;VP=1;VF=EMpass;AC=1;AF=0.00258;EMstats=56.52:-31.26;HWEstats=-0.0;MQS=1,0,0,13106;FLANKSEQ=cccatgcagg:C:atctggcagc
 void print_crispheader(struct OPTIONS* options)
 {
 	FILE* vfile = options->vfile;
@@ -28,20 +29,29 @@ void print_crispheader(struct OPTIONS* options)
 	fprintf(vfile,"##reference=%s\n",options->fastafile);
 	fprintf(vfile,"##options: poolsize=%d,bamfiles=%d,qvoffset=%d,bedfile=%s,min_base_quality=%d\n",options->POOLSIZE,options->bamfiles,QVoffset,options->bedfile,MINQ);
 	fprintf(vfile,"##INFO=<ID=NP,Number=1,Type=Integer,Description=\"Number of Pools With Data\">\n");
-	fprintf(vfile,"##INFO=<ID=DP,Number=2,Type=Integer,Description=\"Total number of reads (+strand,-strand) across all pools (filtered reads only)\">\n");
+	fprintf(vfile,"##INFO=<ID=DP,Number=.,Type=Integer,Description=\"Total number of reads (+strand,-strand,bidirectional) across all pools (filtered reads only)\">\n");
 	fprintf(vfile,"##INFO=<ID=CT,Number=.,Type=Float,Description=\"contingency table p-value for each variant allele in same order as listed in column 5\">\n");
+	fprintf(vfile,"##INFO=<ID=AC,Number=.,Type=Integer,Description=\"estimated allele count (across all pools) for each variant allele in same order as listed in column 5\">\n");
+	fprintf(vfile,"##INFO=<ID=AF,Number=.,Type=Float,Description=\"estimated allele frequency for (estimated by EM algorithm jointly across all pools) each variant allele in same order as listed in column 5\">\n");
+	fprintf(vfile,"##INFO=<ID=FLANKSEQ,Number=1,Type=String,Description=\"sequence flanking the variant\">\n");
+	fprintf(vfile,"##INFO=<ID=VT,Number=1,Type=String,Description=\"variant type, SNV, INSERTION or DELETION\">\n");
+	fprintf(vfile,"##INFO=<ID=EMstats,Number=.,Type=String,Description=\"statistics from EM algorithm\">\n");
+	fprintf(vfile,"##INFO=<ID=HWEstats,Number=.,Type=String,Description=\"p-value for HWE test across all pools\">\n");
+	fprintf(vfile,"##INFO=<ID=VF,Number=.,Type=String,Description=\"EMpass or EMfail, EMfail variants should be discarded\">\n");
 	//fprintf(vfile,"##INFO=<ID=QVpf,Number=.,Type=Float,Description=\"quality values based p-value for each variant allele using forward strand reads\">\n");
 	//fprintf(vfile,"##INFO=<ID=QVpr,Number=.,Type=Float,Description=\"quality values based p-value for each variant allele using reverse strand reads\">\n");
 	fprintf(vfile,"##INFO=<ID=VP,Number=.,Type=Integer,Description=\"Number of Pools with variant allele(s)\">\n");
 	fprintf(vfile,"##INFO=<ID=HP,Number=.,Type=Integer,Description=\"Ambiguity in positioning of indel (homopolymer run length or microsatellite length)\">\n");
-	fprintf(vfile,"##INFO=<ID=MQ,Number=.,Type=Integer,Description=\"# of reads with mapping qualities 0-9,10-19,20-39,40-255\">\n");
+	fprintf(vfile,"##INFO=<ID=MQS,Number=.,Type=Integer,Description=\"# of reads with mapping qualities 0-9,10-19,20-39,40-255\">\n");
 	fprintf(vfile,"##FILTER=<ID=StrandBias,Description=\"strand bias in distribution of reads between reference and variant alleles on two strands\">\n");
 	fprintf(vfile,"##FILTER=<ID=LowDepth,Description=\"low average coverage: less than 1 (filtered) read per haplotype across all samples \">\n");
 	fprintf(vfile,"##FILTER=<ID=LowMQ20,Description=\" >20 percent of reads have mapping quality score less than 20\">\n");
 	fprintf(vfile,"##FILTER=<ID=LowMQ10,Description=\" >10 percent of reads have mapping quality score less than 20\">\n");
 	fprintf(vfile,"##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n");
+	fprintf(vfile,"##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read Depth\">\n");
+	fprintf(vfile,"##FORMAT=<ID=GQ,Number=1,Type=Integer,Description=\"Genotype Quality\">\n");
 	//fprintf(vfile,"##FORMAT=<ID=PP,Number=.,Type=Float,Description=\"Probability that the pool contains the variant allele(s), one value for each variant allele listed in column 5\">\n");
-	fprintf(vfile,"##FORMAT=<ID=MLAC,Number=.,Type=Integer,Description=\"Maximum likelihood estimate for the allele counts for the ALT allele(s), in the same order as listed in column 5\">\n");
+	fprintf(vfile,"##FORMAT=<ID=AC,Number=.,Type=Integer,Description=\"Maximum likelihood estimate for the allele counts for the ALT allele(s), in the same order as listed in column 5\">\n");
 	fprintf(vfile,"##FORMAT=<ID=AF,Number=.,Type=Float,Description=\"variant allele frequency in pool, one value for each variant allele listed in column 5\">\n");
 	fprintf(vfile,"##FORMAT=<ID=ADf,Number=.,Type=Integer,Description=\"Number of reads aligned to the forward strand of the genome supporting reference allele and the alternate alleles in the order listed\">\n");
 	fprintf(vfile,"##FORMAT=<ID=ADr,Number=.,Type=Integer,Description=\"Number of reads aligned to the reverse strand of the genome supporting reference allele and the alternate alleles in the order listed\">\n");
@@ -57,7 +67,7 @@ void print_crispheader(struct OPTIONS* options)
 
 void print_crispoptions()
 {
-	fprintf(stderr,"\nCRISP: statistical method to identify SNVs and indels from pooled DNA sequencing data (requires multiple samples (pools), ideally >=5 samples)\n\n");
+	fprintf(stderr,"\nCRISP: statistical method to identify SNVs and indels from pooled DNA sequencing data (requires multiple samples (pools), ideally >=5 samples)\n\n Please provide a bed-file for calling variants on human samples to avoid large output files\n\n");
 	fprintf(stderr,"./CRISP [options] --bams file_bam_paths --ref reference.fasta --VCF variantcalls.VCF -p poolsize > variantcalls.log\n\n");
 	fprintf(stderr,"Options:\n");
 	fprintf(stderr,"         --bams         	textfile with list of bam file paths (one for each pool)\n");
@@ -66,7 +76,7 @@ void print_crispoptions()
 	fprintf(stderr,"         --bed       		bed file for list of regions in which variants should be called (format is chrom start end on each line)\n");
 	fprintf(stderr,"         -p/--poolsize <int>    poolsize (number of haploid genomes in each pool), for diploid genomes: 2 x # individuals\n");
 	fprintf(stderr,"         --VCF       		VCF file to which the variant calls will be output \n");
-	fprintf(stderr,"         --qvoffset <int> 	quality value offset, 33 for Sanger format (default)\n");
+	fprintf(stderr,"         --qvoffset <int> 	quality value offset, 33 is default\n");
 	// change this to --phred33 or phred 64 
 	fprintf(stderr,"         --mbq     <int>  	minimum base quality to consider a base for variant calling, default 10\n");
 	fprintf(stderr,"         --mmq     <int>  	minimum read mapping quality to consider a read for variant calling, default 20\n");
@@ -89,15 +99,14 @@ void print_crispoptions()
 	fprintf(stderr," 1. CRISP requires poolsize and reference fasta file for making variant calls\n");
 	fprintf(stderr," 2. CRISP requires at least two pools to make variant calls, but at least 5 pools are ideal\n");
 	fprintf(stderr," 3. The reference sequence file should be indexed using 'samtools faidx' or a similar program and placed in same directory as fasta file with extension .fai\n");
-	fprintf(stderr," 4. The ploidy of each pool is assumed to be the same, this will be changed in future releases\n");
+	fprintf(stderr," 4. The ploidy of each pool is assumed to be the same, see the FAQ file for how to specify variable ploidy for each pool\n");
 	fprintf(stderr," 5. For human re-sequencing, if a bedfile is not specified, the program will evaluate each base for variant calling and the output log file can be huge\n");
-	fprintf(stderr," 6. Please set the quality value offset correctly: 33 for quality values encoded in Sanger format and 64 for Illumina 1.3+ format. Setting this value incorrectly can result in significant overcalling/undercalling of variants. Default is 33\n");
-	fprintf(stderr," 7. Please make sure that the reference sequence file is the same as the one used to align the reads in the BAM files and that the BAM files are coordinate sorted\n");
-	fprintf(stderr," 8. For indel analysis, CRISP assumes that indels are left justified, --leftalign 1 option can be used to left justify gaps in aligned reads\n");
-	fprintf(stderr," 9. the program uses the samtools API for reading bam files \n");
-	fprintf(stderr," 10. BAM files should be indexed in order to use the --regions option with the indexed bam file as pooln.bam.bai\n\n");
-        fprintf(stderr," 11. The aligned reads for each pool should be in a single bam file that is sorted by chromosomal coordinates\n");
-        fprintf(stderr," 12. The ctpval and qvpval thresholds are only used with EM = 0 option (older version of CRISP)\n");
+	fprintf(stderr," 6. Please make sure that the reference sequence file is the same as the one used to align the reads in the BAM files and that the BAM files are coordinate sorted\n");
+	fprintf(stderr," 7. For indel analysis, CRISP assumes that indels are left justified, --leftalign 1 option can be used to left justify gaps in aligned reads\n");
+	fprintf(stderr," 8. the program uses the samtools API for reading bam files \n");
+	fprintf(stderr," 9. BAM files should be indexed in order to use the --regions option with the indexed bam file as pooln.bam.bai\n\n");
+        fprintf(stderr," 10. The aligned reads for each pool should be in a single bam file that is sorted by chromosomal coordinates\n");
+        //fprintf(stderr," 11. The ctpval and qvpval thresholds are only used with EM = 0 option (older version of CRISP)\n");
 
 	//fprintf(stderr," 11. The bed file can be used to re-call variants at specified positions in the genome\n\n");
 	//fprintf(stderr," 7. The value of the parameter --maxm should be choosen based on average length of reads (3 for < 75-bp reads, 4 for < 100 bp reads...)\n\n");

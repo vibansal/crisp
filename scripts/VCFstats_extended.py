@@ -61,6 +61,8 @@ def variantstats(vfile1):
 
 	CHROM_line_found = 0; columns = -1; 
 
+	st= [0,0,0,0];
+
         for line in File1:
                 var = line.strip().split('\t');  
 		if var[0] == '#CHROM': 
@@ -89,7 +91,7 @@ def variantstats(vfile1):
 			if varsites ==1: 
 				pool_sizes.append(len(genotype)); ## calculate poolsize using length of genotype vector 
 				total_allele_count += len(genotype);  
-				for i in xrange(len(genotype)): AFS.append(0); AF_hist.append(0.0); 
+				for t in xrange(len(genotype)): AFS.append(0); AF_hist.append(0.0); 
 
 			for g in genotype: 
 				if g == '.': counts[0] +=1; 
@@ -128,16 +130,19 @@ def variantstats(vfile1):
 		## else
 		############################################################################################################
 		## vartype: 0 = Ts(SNP), 1 = Tv, 2 = MNP, 3 = DEL_3, 4 = DEL, 5 = INS_3, 6 = INS
+		st[3] += len(altalleles);
                 for i in xrange(len(altalleles)):
-                        rl = len(refallele); al = len(altalleles[i]); vartype = -1;
-                        if rl == al and len(refallele) ==1: vartype = 0;
-			elif rl == al: vartype = 2; ## MNP
+                        rl = len(refallele); al = len(altalleles[i]); vartype = -1; 
+                        if rl == al and len(refallele) ==1: vartype = 0; st[2] +=1; 
+			elif rl == al: vartype = 2; st[2] +=1; ## MNP
                         elif rl < al:
+				st[0] +=1; 
                                 if (al-rl)%3 ==0: vartype = 5;
 				else: vartype = 6;
 				try: INDEL_lengths[al-rl] +=1;
 				except KeyError: INDEL_lengths[al-rl] =1;
                         elif rl > al:
+				st[1] +=1; 
                                 if (rl-al)%3 ==0: vartype = 3;
 				else: vartype = 4;
 				try: INDEL_lengths[al-rl] +=1;
@@ -173,6 +178,8 @@ def variantstats(vfile1):
 	print 'Multi-allelic variants',multi_allelic_variants[0],multi_allelic_variants[1],multi_allelic_variants[2],'SNVs',tri_allelic_SNVs,'Indels:',multi_allelic_indels;
         if Ts+Tv >0: print 'Ts/Tv: %0.3f %d/%d Transitions: A-G:%d C-T:%d Transversions: A-C:%d A-T:%d C-G:%d G-T:%d\n' %(float(Ts)/Tv,Ts,Tv,AG,CT,AC,AT,CG,GT);
 	else: print;
+
+	print >>sys.stderr, "stats",st;
 
 	print_INDEL_lengths(INDEL_lengths);
 

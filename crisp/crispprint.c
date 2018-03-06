@@ -42,6 +42,7 @@ int print_pooledvariant(struct VARIANT* variant,FILE* vfile,REFLIST* reflist,int
 		fprintf(vfile,"%s\t%d\t.\t%c",variant->chrom,variant->position,variant->previousbase); 
 		for (j=1;j<longestdel;j++) fprintf(vfile,"%c",variant->itb[variant->alleles[k]][j]); fprintf(vfile,"\t");
 
+		// print alt allele 
 		for (i=0;i<variant->varalleles;i++)
 		{
 			fprintf(vfile,"%c",variant->previousbase);
@@ -184,7 +185,7 @@ int print_pooledvariant(struct VARIANT* variant,FILE* vfile,REFLIST* reflist,int
 	for (i=0;i<variant->varalleles;i++) { fprintf(vfile,"%.1f",variant->qvpvaluef[i]); if (i < variant->varalleles-1) fprintf(vfile,","); else fprintf(vfile,";QVpr="); } 
 	for (i=0;i<variant->varalleles;i++) { fprintf(vfile,"%.1f",variant->qvpvaluer[i]); if (i < variant->varalleles-1) fprintf(vfile,","); } 
 
-	fprintf(vfile,";MQ=%d,%d,%d,%d;",variant->MQcounts[0],variant->MQcounts[1],variant->MQcounts[2],variant->MQcounts[3]);
+	fprintf(vfile,";MQS=%d,%d,%d,%d;",variant->MQcounts[0],variant->MQcounts[1],variant->MQcounts[2],variant->MQcounts[3]);
 
 	if (insallele + delallele > 0)
 	{

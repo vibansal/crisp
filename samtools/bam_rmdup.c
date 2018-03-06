@@ -22,8 +22,9 @@ KHASH_MAP_INIT_STR(lib, lib_aux_t)
 typedef struct {
 	int n, max;
 	bam1_t **a;
-} tmp_stack_t;
+} tmp_stack_t; // stack to keeep current list of reads 
 
+// add read to stack, realloc stack if needed...
 static inline void stack_insert(tmp_stack_t *stack, bam1_t *b)
 {
 	if (stack->n == stack->max) {
@@ -33,6 +34,7 @@ static inline void stack_insert(tmp_stack_t *stack, bam1_t *b)
 	stack->a[stack->n++] = b;
 }
 
+// output reads to the new sam/bamfile 
 static inline void dump_best(tmp_stack_t *stack, samfile_t *out)
 {
 	int i;
@@ -122,9 +124,10 @@ void bam_rmdup_core(samfile_t *in, samfile_t *out)
 				fprintf(stderr, "[bam_rmdup_core] processing reference %s...\n", in->header->target_name[c->tid]);
 			}
 		}
-		if (!(c->flag&BAM_FPAIRED) || (c->flag&(BAM_FUNMAP|BAM_FMUNMAP)) || (c->mtid >= 0 && c->tid != c->mtid)) {
+		if (!(c->flag&BAM_FPAIRED) || (c->flag&(BAM_FUNMAP|BAM_FMUNMAP)) || (c->mtid >= 0 && c->tid != c->mtid)) { // single-end reads, unmapped reads, reads with mate on diff chromosome are output as is... these should not be considered for estimating PCR duplicaiton rate 
 			samwrite(out, b);
-		} else if (c->isize > 0) { // paired, head
+		} 
+		else if (c->isize > 0) { // paired, first read in pair 
 			uint64_t key = (uint64_t)c->pos<<32 | c->isize;
 			const char *lib;
 			lib_aux_t *q;
@@ -146,7 +149,7 @@ void bam_rmdup_core(samfile_t *in, samfile_t *out)
 				kh_val(q->best_hash, k) = bam_dup1(b);
 				stack_insert(&stack, kh_val(q->best_hash, k));
 			}
-		} else { // paired, tail
+		} else { // paired, second read in pair 
 			k = kh_get(name, del_set, bam1_qname(b));
 			if (k != kh_end(del_set)) {
 				free((char*)kh_key(del_set, k));

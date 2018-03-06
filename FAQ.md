@@ -52,9 +52,8 @@ i.e. indels with multiple variant alleles) from pooled sequence data. For indel 
 --leftalign 1 option can be used to left justify gaps in aligned reads
 
 
-***Common sources of Errors while running CRISP***
+***Using the CRISP VCF with other tools***
 
-If you get a segmentation fault while running CRISP, try to compile CRISP from the source code 
-on your system.
+1. The CRISP VCF should be converted to a standard pooled-genotype VCF using the python script "convert_pooled_vcf.py" available in the scripts sub-folder
 
 
