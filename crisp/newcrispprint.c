@@ -108,7 +108,7 @@ void print_VCF_allelefreqs(struct VARIANT* variant,FILE* vfile)
 
                 j=0; fprintf(vfile,"\t0/0:%0.3f",(float)(variant->indcounts[i][variant->alleles[j]] + variant->indcounts[i][variant->alleles[j]+maxalleles] + variant->indcounts[i][variant->alleles[j]+2*maxalleles])/(coverage+0.001));
                 for (j=1;j<variant->varalleles;j++) fprintf(vfile,",%0.3f",(float)(variant->indcounts[i][variant->alleles[j]] + variant->indcounts[i][variant->alleles[j]+maxalleles]+variant->indcounts[i][variant->alleles[j]+2*maxalleles])/(coverage+0.001));
-		fprintf(vfile,":%d",coverage);
+		//fprintf(vfile,":%d",coverage);
 		fprintf(vfile,":%d",variant->readdepths[i]);
 
 		// add 1/2 of bidirection reads to the two strands and print coverage for each allele on each strand
