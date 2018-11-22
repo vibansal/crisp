@@ -1,12 +1,17 @@
-####################################################################################################
+################################################################################################
 
 CRISP: Comprehensive Read Analysis for Identification of SNVs (and short indels) from Pooled sequencing data
 
 Contact: Vikas Bansal, vibansal@ucsd.edu
 
-Citation: A statistical method for the detection of variants from next-generation resequencing of DNA pools, V. Bansal. Bioinformatics 26(12), 2010
+Citation: 
 
-######################################################################################################
+A statistical method for the detection of variants from next-generation resequencing of DNA pools, V. Bansal. Bioinformatics 26(12), 2010
+
+Efficient and Cost Effective Population Resequencing by Pooling and In-Solution Hybridization. V. Bansal et al. PloS ONE 2011. 
+
+
+#################################################################################################
 
 Introduction:
 =============
@@ -29,7 +34,7 @@ The first step is to align the reads from the sequencing experiment to the refer
 ./CRISP [options] --bams file_bam_paths --ref reference.fasta --VCF variantcalls.VCF --poolsize poolsize --bed targets.bed > variantcalls.log
 
 
-Important Notes:
+***Important Notes:***
 
 1. CRISP requires at least four arguments: poolsize, reference fasta file, bamfiles and the output VCF file
 2. BAM files can be specified in two ways: 
