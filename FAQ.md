@@ -1,5 +1,5 @@
 
-**CRISP can deal with variable pool sizes** 
+**Variable pool sizes** 
 
 The input file (--bams) to CRISP should specify the pool size (2 x number of individuals, assuming diploid genomes) on each line as follows: 
 
@@ -18,7 +18,6 @@ pool20.bam PS=36
 and uses a likelihood ratio test (in addition to the contingency table analysis) to call variants. This is 
 recommended for artificial pooled sequencing studies. 
 
-
 --EM 0 corresponds to the original CRISP method that uses the contingency table analysis and per pool filters
 to identify variant sites and report allele frequencies for each pool. The ctpval and qvpval 
 thresholds are only used with EM = 0 option
@@ -28,8 +27,7 @@ thresholds are only used with EM = 0 option
 
 It is recommended to specify a bedfile (--bed option) for targeted sequencing experiments. If a bedfile is 
 not specified, the program will evaluate each base for variant calling and the output file can be quite
-large. If the bedfile is specified, CRISP will only call variants in the regions listed in the bedfile. To call variants in the
-region flanking the targeted intervals, --flanking option can be used. With "--flanking 50" option, 
+large. If the bedfile is specified, CRISP will only call variants in the regions listed in the bedfile. To call variants in the region flanking the targeted intervals, --flanking option can be used. With "--flanking 50" option, 
 variants will also be called in a 50 bp region flanking every interval. 
 
 ***Some requirements before running CRISP***
@@ -48,12 +46,21 @@ the reads in the BAM files
 ***calling of short insertions/deletions (indels)***
 
 CRISP can call short indels as well as SNVs. However, it is difficult to call multi-allelic indels (
-i.e. indels with multiple variant alleles) from pooled sequence data. For indel analysis, CRISP assumes that indels are left justified, 
---leftalign 1 option can be used to left justify gaps in aligned reads
+i.e. indels with multiple variant alleles) from pooled sequence data. For indel analysis, CRISP assumes that indels are left justified, --leftalign 1 option can be used to left justify gaps in aligned reads
 
 
 ***Using the CRISP VCF with other tools***
 
 1. The CRISP VCF should be converted to a standard pooled-genotype VCF using the python script "convert_pooled_vcf.py" available in the scripts sub-folder
+
+***Empty VCF file after running CRISP***
+
+This can be caused by: 
+
+1. Low mapping quality of reads (default filter of 20)
+2. Chromosome names in the bed file are different the reference genome
+3. Issues with the bed file (try running CRISP using the --regions option on a small genomic region) 
+4. using the option "--qvoffset 64" when the quality value offset is 33
+
 
 
