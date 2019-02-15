@@ -152,12 +152,16 @@ void output_allele_counts(REFLIST* reflist,int current,struct VARIANT* variant,A
 		fprintf(vfile,"%s ",variant->itb[allele]);
 	}
 	fprintf(vfile,"FLANKSEQ=");
-        for (j=-21;j<-1;j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
-        fprintf(vfile,":");
-        for (j=-1;j<printhomseq;j++) fprintf(vfile,"%c",toupper(reflist->sequences[current][variant->position+j]));
-        fprintf(vfile,":");
-        for (j=printhomseq;j<printhomseq+20;j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
-        fprintf(vfile,"\n");
+	if (variant->position-21 >=0 && variant->position + printhomseq+20 <= reflist->lengths[current])
+	{
+		for (j=-21;j<-1;j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
+		fprintf(vfile,":");
+		for (j=-1;j<printhomseq;j++) fprintf(vfile,"%c",toupper(reflist->sequences[current][variant->position+j]));
+		fprintf(vfile,":");
+		for (j=printhomseq;j<printhomseq+20;j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
+		fprintf(vfile,"\n");
+	}
+	else fprintf(vfile,".");
 
 	for (j=0;j<4;j++)
 	{

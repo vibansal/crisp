@@ -197,25 +197,32 @@ int print_pooledvariant(struct VARIANT* variant,FILE* vfile,REFLIST* reflist,int
 			if (variant->alleles[i] >=4 && variant->itb[variant->alleles[i]][0] == '+' && variant->HPlength[variant->alleles[i]] > printhomseq) printhomseq= variant->HPlength[variant->alleles[i]];
 			else if (variant->alleles[i] >=4 && variant->itb[variant->alleles[i]][0] == '-' && variant->HPlength[variant->alleles[i]] + strlen(variant->itb[variant->alleles[i]])-1 > printhomseq) printhomseq= variant->HPlength[variant->alleles[i]] + strlen(variant->itb[variant->alleles[i]])-1;
 		} 
-		if (printhomseq >=0 && variant->position-11  >=0 && variant->position+printhomseq+10 < reflist->lengths[current]) 	
+		if (printhomseq >=0) 	
 		{
 			fprintf(vfile,";FLANKSEQ=");  
-			for (j=-11;j<-1;j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
-			fprintf(vfile,":");
-			for (j=-1;j<printhomseq;j++) fprintf(vfile,"%c",toupper(reflist->sequences[current][variant->position+j])); 
-			fprintf(vfile,":");
-			for (j=printhomseq;j<printhomseq+10;j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
+			if (variant->position-11 >=0 && variant->position + printhomseq+10 <= reflist->lengths[current])
+			{
+				for (j=-11;j<-1;j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
+				fprintf(vfile,":");
+				for (j=-1;j<printhomseq;j++) fprintf(vfile,"%c",toupper(reflist->sequences[current][variant->position+j])); 
+				fprintf(vfile,":");
+				for (j=printhomseq;j<printhomseq+10;j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
+			}
+			else fprintf(vfile,".");
 		} 
 	}
 	else //print flanking sequence even for SNPs
 	{
 		fprintf(vfile,"FLANKSEQ=");  
-		j=-10; if (variant->position +j <0) j = 0;
-		for (j=-10;j<0;j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
-		fprintf(vfile,":");
-		for (j=0;j<1;j++) fprintf(vfile,"%c",toupper(reflist->sequences[current][variant->position+j])); 
-		fprintf(vfile,":");
-		for (j=1;j<11 && j+variant->position<reflist->lengths[current];j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
+		if (variant->position-11 >=0 && variant->position + 11 <= reflist->lengths[current])
+		{
+			for (j=-10;j<0;j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
+			fprintf(vfile,":");
+			for (j=0;j<1;j++) fprintf(vfile,"%c",toupper(reflist->sequences[current][variant->position+j])); 
+			fprintf(vfile,":");
+			for (j=1;j<11;j++) fprintf(vfile,"%c",tolower(reflist->sequences[current][variant->position+j]));
+		}
+		else fprintf(vfile,".");
 	}
 
 #if MLMETHOD ==1
