@@ -11,10 +11,10 @@ all:
 	mkdir -p include bin;
 	$(MAKE) -C . new
 	#$(MAKE) -C . crisp
-	$(MAKE) -C . indel
+	#$(MAKE) -C . indel
 
 new: include/readfasta.o include/bamsreader.o include/variant.o include/allelecounts.o include/chisquare.o include/contables.o include/newcrispcaller.o optionparser.c FET/lowcovFET.c include/bamread.o
-	$(CC) -DPICALL=3 -Iparsebam -I$(SAMTOOLS) -g -O2 include/readfasta.o include/variant.o include/allelecounts.o include/bamsreader.o include/newcrispcaller.o include/chisquare.o include/contables.o include/bamread.o -lm readmultiplebams.c -o bin/CRISP-genotypes -L$(SAMTOOLS) -lbam -lz
+	$(CC) -DPICALL=3 -Iparsebam -I$(SAMTOOLS) -g -O2 include/readfasta.o include/variant.o include/allelecounts.o include/bamsreader.o include/newcrispcaller.o include/chisquare.o include/contables.o include/bamread.o -lm readmultiplebams.c -o bin/CRISP.binary -L$(SAMTOOLS) -lbam -lz
 
 
 ## this is the older version of CRISP that does not call genotypes
