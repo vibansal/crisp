@@ -137,12 +137,12 @@ void print_VCF_genotypes_diploid(struct VARIANT* variant, FILE* vfile)
 
 	if (variant->counts[variant->refbase+2*maxalleles] + variant->counts[variant->alleles[0]+2*maxalleles] >= 2) bidir = 1;
 	//if (bidir == 1) 
-	fprintf(vfile,"\tGT:GQ:DP:ADf:ADr:ADb\t");  
+	fprintf(vfile,"\tGT:GQ:DP:ADf:ADr:ADb");  
 	//else fprintf(vfile,"\tGT:GQ:DP:ADf:ADr\t");
-	
 
 	for (i=0;i<variant->samples;i++)
 	{
+		fprintf(vfile,"\t");
 		if ((double)variant->readdepths[i]/variant->ploidy[i] <= 1) fprintf(vfile,"./.:."); 
 		else if (variant->varalleles ==1) // print genotypes for bi-allelic variants
 		{
@@ -176,7 +176,6 @@ void print_VCF_genotypes_diploid(struct VARIANT* variant, FILE* vfile)
 			for (j=0;j<variant->varalleles;j++) fprintf(vfile,",%d",variant->indcounts[i][variant->alleles[j]+2*maxalleles]);
 		}
 		else { fprintf(vfile,":0"); for (j=0;j<variant->varalleles;j++) fprintf(vfile,",0"); } 
-		fprintf(vfile,"\t");
 	}
 	fprintf(vfile,"\n");
 	
@@ -188,7 +187,7 @@ void print_VCF_genotypes_pooled_full(struct VARIANT* variant,FILE* vfile)
 	int i=0,j=0,k=0,coverage=0,bidir=0;
 	if (variant->counts[variant->refbase+2*maxalleles] + variant->counts[variant->alleles[0]+2*maxalleles] >= 2) bidir = 1;
 	//if (bidir == 1) fprintf(vfile,"\tGT:GQ:AC:DP:ADf:ADr:ADb\t");  else fprintf(vfile,"\tGT:GQ:AC:DP:ADf:ADr\t");
-	fprintf(vfile,"\tGT:GQ:AC:DP:ADf:ADr:ADb\t");  
+	fprintf(vfile,"\tGT:GQ:AC:DP:ADf:ADr:ADb");  
 
 	int AC1 = 0, AC2 = 0; int printflag = 0;
 	for (i=0;i<variant->samples;i++)
@@ -200,6 +199,7 @@ void print_VCF_genotypes_pooled_full(struct VARIANT* variant,FILE* vfile)
 
 	for (i=0;i<variant->samples;i++)
 	{
+		fprintf(vfile,"\t");
 		if ((double)variant->readdepths[i]/variant->ploidy[i] <= 1) 
 		{
 			for (j=0;j<variant->ploidy[i];j++) fprintf(vfile,"./"); fprintf(vfile,".:0:.");
@@ -240,7 +240,6 @@ void print_VCF_genotypes_pooled_full(struct VARIANT* variant,FILE* vfile)
 		}
 		else { fprintf(vfile,":0"); for (j=0;j<variant->varalleles;j++) fprintf(vfile,",0"); } 
 		//if (variant->crispvar[0].AC[i] > 0) fprintf(vfile,":="); else fprintf(vfile,":."); 
-		fprintf(vfile,"\t");
 	}
 	fprintf(vfile,"\n");
 }
@@ -250,9 +249,10 @@ void print_VCF_genotypes_pooled(struct VARIANT* variant,FILE* vfile)
 {
 	int i=0,j=0,k=0,coverage=0,bidir=0;
 	if (variant->counts[variant->refbase+2*maxalleles] + variant->counts[variant->alleles[0]+2*maxalleles] >= 2) bidir = 1;
-	fprintf(vfile,"\tAC:GQ:DP:ADf:ADr:ADb\t");  //else fprintf(vfile,"\tMLAC:GQ:DP:ADf:ADr\t");
+	fprintf(vfile,"\tAC:GQ:DP:ADf:ADr:ADb");  //else fprintf(vfile,"\tMLAC:GQ:DP:ADf:ADr\t");
 	for (i=0;i<variant->samples;i++)
 	{
+		fprintf(vfile,"\t");
 		if ((double)variant->readdepths[i]/variant->ploidy[i] <= 1) fprintf(vfile,"."); 
 		else if (variant->ploidy[0] > 2 && variant->varpoolsize > 0)  // print reference allele count as well.
 		{
@@ -294,7 +294,6 @@ void print_VCF_genotypes_pooled(struct VARIANT* variant,FILE* vfile)
 		}
 		else {  fprintf(vfile,":0"); for (j=0;j<variant->varalleles;j++) fprintf(vfile,",0"); } 
 		//if (variant->crispvar[0].AC[i] > 0) fprintf(vfile,":="); else fprintf(vfile,":."); 
-		fprintf(vfile,"\t");
 	}
 	fprintf(vfile,"\n");
 }

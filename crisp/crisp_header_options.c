@@ -48,7 +48,7 @@ void print_crispheader(struct OPTIONS* options)
 	fprintf(vfile,"##FILTER=<ID=LowMQ20,Description=\" >20 percent of reads have mapping quality score less than 20\">\n");
 	fprintf(vfile,"##FILTER=<ID=LowMQ10,Description=\" >10 percent of reads have mapping quality score less than 20\">\n");
 	fprintf(vfile,"##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n");
-	fprintf(vfile,"##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read Depth\">\n");
+	fprintf(vfile,"##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read Depth for each pool/sample (includes all reads)\">\n");
 	fprintf(vfile,"##FORMAT=<ID=GQ,Number=1,Type=Integer,Description=\"Genotype Quality\">\n");
 	//fprintf(vfile,"##FORMAT=<ID=PP,Number=.,Type=Float,Description=\"Probability that the pool contains the variant allele(s), one value for each variant allele listed in column 5\">\n");
 	fprintf(vfile,"##FORMAT=<ID=AC,Number=.,Type=Integer,Description=\"Maximum likelihood estimate for the allele counts for the ALT allele(s), in the same order as listed in column 5\">\n");
