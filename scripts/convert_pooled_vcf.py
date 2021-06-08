@@ -3,6 +3,7 @@ import sys, os, glob, string, subprocess,time, math, re, compiler
 
 ## coded july 15 2015, code to convert CRISP pooled allele count to genotype 0/0/0/0/0/1 format so that it is compatible with standard tools
 ## if the sum of allele counts is more than poolsize, program ignores that variant. 
+## this code works with python version 2.7 (not with 3+ versions)
 
 if len(sys.argv) < 3: 
 	print >>sys.stderr, "\n\nPROGRAM to convert CRISP VCF for pooled samples to a standard VCF where genotypes are in the form 0/0/0/0/0/1"; 
