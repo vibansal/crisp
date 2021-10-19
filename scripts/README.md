@@ -17,4 +17,4 @@ All these programs take as input a VCF and output summary statistics (and a new 
 5. Generate a VCF file with variants that overlap intervals in a bed file: This can be done using bedtools (http://bedtools.readthedocs.org/en/latest/)
 
 
-These scripts work with older versions of python (tested with v2.7) and will not work with new (3+) version of python.
+### These scripts work with older versions of python (tested with v2.7) and will not work with new (3+) version of python.
