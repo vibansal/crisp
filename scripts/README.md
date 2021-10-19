@@ -17,13 +17,4 @@ All these programs take as input a VCF and output summary statistics (and a new 
 5. Generate a VCF file with variants that overlap intervals in a bed file: This can be done using bedtools (http://bedtools.readthedocs.org/en/latest/)
 
 
-## TO BE ADDED SOON
-
-A. filter variants using LR statistic and chi-square table statistic (user-specified thresholds)
-
-B. INDELS: calculate fraction of indels in homopolymer runs and identify regions with clusters of variants in low-complexity sequence 
-
-C. identify somatic mutations in tumor-normal sequencing using list of tumor-normal pairs 
-
-D. split tri-allelic variants into multiple variants for ease of annotation and rare variant association testing
-
+These scripts work with older versions of python (tested with v2.7) and will not work with new (3+) version of python.
