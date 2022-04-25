@@ -135,8 +135,10 @@ int jointvariantcaller(REFLIST* reflist,int current,int position,READQUEUE* bq,s
 int callvariants(REFLIST* reflist,int current,int first,int last,READQUEUE* bq,struct BAMFILE_data* bamfiles_data,struct OPTIONS* options,struct VARIANT* variant)
 {
 	int i=0, k=0,reads=0; 
+	int flag=0;
 
-	if (bq->first == NULL) return 0;  else if ((bq->first)->position > first) first = (bq->first)->position; 
+	if (bq->first == NULL) return 0;  
+	else if ((bq->first)->position > first) first = (bq->first)->position; 
 
 	// find first interval whose ending is after the current position
 	if (targeted ==1 && reflist->cinterval < 0) reflist->cinterval = reflist->first_interval_chrom[current]; 
@@ -171,15 +173,19 @@ int callvariants(REFLIST* reflist,int current,int first,int last,READQUEUE* bq,s
 		if (CALL_VARIANTS ==0) continue;  // do not call variants, for evaluation purposes only
 
 		if (targeted ==0) jointvariantcaller(reflist,current,k,bq,bamfiles_data,variant,options,0); // whole-genome variant calling 
-
 		//if ((targeted ==0) || (targeted ==1 && (islower(reflist->sequences[current][k]) || reads >= 1000000)))  
 		else if (reflist->cinterval >=0) //extra condition for chromosomes not in bedfile bug fixed sept 9 2012
 		{
-			while (reflist->intervallist[reflist->cinterval].end < k) 
+			flag=0;
+			while (flag == 0) // if end of current interval is less than 'k' (variant position)
 			{
-				if (reflist->intervallist[reflist->cinterval].chrom != current || reflist->cinterval >= reflist->intervals) break;
-				reflist->cinterval++; 
+				if (reflist->cinterval >= reflist->intervals) flag=1;
+				else if (reflist->intervallist[reflist->cinterval].chrom != current) flag =1;
+				else if (k<= reflist->intervallist[reflist->cinterval].end) break;
+				else reflist->cinterval++; 
 			}
+			if (flag==1) break; // added 04/25/2022 to fix incorrect behavior
+
 			if (k >= reflist->intervallist[reflist->cinterval].start && k <= reflist->intervallist[reflist->cinterval].end )
 			{
 				//fprintf(stdout,"BED:%d-%d %d| ",reflist->intervallist[reflist->cinterval].start,reflist->intervallist[reflist->cinterval].end,reads);

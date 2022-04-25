@@ -215,6 +215,7 @@ int read_fasta(char* seqfile, REFLIST* reflist)
 	return 1;
 }
 
+// this function should use the order of chromosomes in reference file 04/25/2022
 int compare_intervals(const void* a, const void* b)
 {
 	const INTERVAL* ia = (const INTERVAL*)a; const INTERVAL* ib = (const INTERVAL*)b; 
@@ -311,13 +312,14 @@ int read_bedfile(char* bedfile,REFLIST* reflist)
 
 	// sort the list of intervals by chromosome and (start,end) pairs
 	qsort(reflist->intervallist,reflist->intervals,sizeof(INTERVAL),compare_intervals);
-	j=0; reflist->first_interval_chrom[0] = 0; 
+	//j=0; 
+	//reflist->first_interval_chrom[0] = 0; 
 	for (i=0;i<reflist->intervals;i++) 
 	{
-		if (reflist->intervallist[i].chrom != j) 
+		if (reflist->first_interval_chrom[reflist->intervallist[i].chrom] < 0 || i < reflist->first_interval_chrom[reflist->intervallist[i].chrom]) //reflist->intervallist[i].chrom ) 
 		{ 
 			reflist->first_interval_chrom[reflist->intervallist[i].chrom] = i; 
-			j = reflist->intervallist[i].chrom; 
+			//j = reflist->intervallist[i].chrom; 
 		} 
 		//fprintf(stdout,"%s %d-%d \n",reflist->names[reflist->intervallist[i].chrom],reflist->intervallist[i].start,reflist->intervallist[i].end);
 	}

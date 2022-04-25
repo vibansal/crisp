@@ -26,7 +26,7 @@ int parse_arguments(int argc,char* argv[],struct OPTIONS* options,char* bamfilep
 		else if (strcmp(argv[i],"--flankingbases") ==0 || strcmp(argv[i],"--fb") ==0 || strcmp(argv[i],"--flanking") ==0)  FLANKING_BASES =atoi(argv[i+1]);
 		else if (strcmp(argv[i],"--pivotsample") ==0) { PIVOTSAMPLE = atoi(argv[i+1]); fprintf(stderr,"samples sequenced on two runs: 1...%d | %d+1... \n",PIVOTSAMPLE,PIVOTSAMPLE+1); } // SOLID reads bioscope 
 		else if (strcmp(argv[i],"--solid") ==0) { SOLID = atoi(argv[i+1]); fprintf(stderr,"solid reads \n"); } // SOLID reads bioscope 
-		else if (strcmp(argv[i],"--regions") ==0) 
+		else if (strcmp(argv[i],"--regions") ==0 || strcmp(argv[i],"--region") ==0 ) 
 		{
 			options->regions = (char*)malloc(strlen(argv[i+1])+1); 
 			strcpy(options->regions,argv[i+1]); // only look in certain regions/intervals for variant calling
