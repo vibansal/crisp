@@ -184,7 +184,8 @@ int callvariants(REFLIST* reflist,int current,int first,int last,READQUEUE* bq,s
 			{
 				//fprintf(stdout,"BED:%d-%d %d| ",reflist->intervallist[reflist->cinterval].start,reflist->intervallist[reflist->cinterval].end,reads);
 				if (reads >= HAPLOTYPES*MIN_COVERAGE_POOL || variant->ploidy[0] == 2) jointvariantcaller(reflist,current,k,bq,bamfiles_data,variant,options,0);
-				//else jointvariantcaller(reflist,current,k,bq,bamfiles_data,variant,options,1);
+				else jointvariantcaller(reflist,current,k,bq,bamfiles_data,variant,options,1);
+				// enable variant calling even for low coverage data within interval from bedfile
 			}
 			else if (reflist->intervallist[reflist->cinterval].start-k > 0 && reflist->intervallist[reflist->cinterval].start-k < FLANKING_BASES &&reads >= MIN_COVERAGE_FLANKING )
 			{

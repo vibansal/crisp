@@ -147,7 +147,7 @@ int read_chromosome(REFLIST* reflist,int chrom,FILE* fp)
 			}
 		}
 		*/
-		fprintf(stderr,"%d %d %d \n",reflist->intervallist[i].end,reflist->intervallist[i].start,i);
+		//fprintf(stderr,"%d %d %d \n",reflist->intervallist[i].end,reflist->intervallist[i].start,i);
 		i++; 
 	}
 	fprintf(stderr,"# targeted bases on chrom is %d/%d \n",k,reflist->lengths[chrom]);
