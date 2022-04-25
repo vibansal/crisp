@@ -147,6 +147,7 @@ int read_chromosome(REFLIST* reflist,int chrom,FILE* fp)
 			}
 		}
 		*/
+		fprintf(stderr,"%d %d %d \n",reflist->intervallist[i].end,reflist->intervallist[i].start,i);
 		i++; 
 	}
 	fprintf(stderr,"# targeted bases on chrom is %d/%d \n",k,reflist->lengths[chrom]);
@@ -320,7 +321,7 @@ int read_bedfile(char* bedfile,REFLIST* reflist)
 		} 
 		//fprintf(stdout,"%s %d-%d \n",reflist->names[reflist->intervallist[i].chrom],reflist->intervallist[i].start,reflist->intervallist[i].end);
 	}
-	//for (i=0;i<reflist->ns;i++) fprintf(stdout,"chrom %s first index %d \n",reflist->names[i],reflist->first_interval_chrom[i]);
+	//for (i=0;i<reflist->ns;i++) fprintf(stderr,"chrom %s first index %d \n",reflist->names[i],reflist->first_interval_chrom[i]);
 	return 1;
 }
 
