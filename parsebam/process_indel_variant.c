@@ -94,7 +94,8 @@ int calculate_indel_ambiguity(struct VARIANT* variant,REFLIST* reflist,int curre
 // we need to go through the baselist and identify the three most common indel alleles and instantiate them in variant->itb
 int identify_indelalleles(REFLIST* reflist,int current,READQUEUE* bq, struct VARIANT* variant)
 {
-	struct INDEL* indelalleles = (struct INDEL*)malloc(sizeof(struct INDEL)*10); int alleles =0;
+	struct INDEL* indelalleles = (struct INDEL*)malloc(sizeof(struct INDEL)*10); 
+	int alleles =0;
 	int offset=0; int i=0,j=0,k=0;int flag =0; int varalleles = 0; int discard=0; int match=0;
 	struct alignedread* bcall = bq->first; 
 	for (bcall = bq->first; bcall != NULL && bcall->position <= variant->position; bcall = bcall->next)
@@ -150,12 +151,28 @@ int identify_indelalleles(REFLIST* reflist,int current,READQUEUE* bq, struct VAR
 	}
 
 	if (alleles > 1) qsort(indelalleles,alleles,sizeof(struct INDEL),indel_cmp);
+
 	if (indelalleles[0].reads < 3) 
 	{
 		for (i=0;i<alleles;i++) free(indelalleles[i].bases); free(indelalleles);
 		return 0;
 	}
-	varalleles =1; strcpy(variant->itb[4],indelalleles[0].bases); 
+
+	// check for presence of long indel, 10/03/2022
+	int longindel=0;
+	if (strlen(indelalleles[0].bases) >= 256) longindel = 1;
+	if (alleles >=2  && indelalleles[1].reads >=3 && strlen(indelalleles[1].bases) >= 256 ) longindel += 1;
+	if (alleles >=3  && indelalleles[2].reads >=3 && strlen(indelalleles[2].bases) >= 256 ) longindel += 1;
+	if (longindel >0)
+	{
+		fprintf(stdout,"long indel > 256 bases detected, ignoring\n");
+		for (i=0;i<alleles;i++) free(indelalleles[i].bases); 
+		free(indelalleles);
+		return 0;
+	}
+	
+	varalleles =1; 
+	strcpy(variant->itb[4],indelalleles[0].bases); 
 	if (alleles >=2  && indelalleles[1].reads >=3) { strcpy(variant->itb[5],indelalleles[1].bases);	varalleles++; }
 	if (alleles >=3  && indelalleles[2].reads >=3) { strcpy(variant->itb[6],indelalleles[2].bases); varalleles++; }
 
