@@ -284,7 +284,7 @@ void print_crispheader(struct OPTIONS* options)
 	FILE* vfile = options->vfile; int i=0;
 	// also print program options, poolsize, qvoffset, etc 
 	time_t now; time(&now); 
-	fprintf(options->vfile,"##fileformat=VCFv4.0\n##fileDate=%s",ctime(&now));
+	fprintf(options->vfile,"##fileformat=VCFv4.2\n##fileDate=%s",ctime(&now));
 	fprintf(vfile,"##source=CRISP_V0.1\n");
 	fprintf(vfile,"##reference=%s\n",options->fastafile);
 	fprintf(vfile,"##options: poolsize=%d,bamfiles=%d,qvoffset=%d,bedfile=%s,min_base_quality=%d\n",options->POOLSIZE,options->bamfiles,QVoffset,options->bedfile,MINQ);
