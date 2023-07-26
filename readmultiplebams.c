@@ -77,7 +77,7 @@ int multisampleVC(struct OPTIONS* options,REFLIST* reflist,FILE* fp)
 	struct BAMFILE_data* bamfiles_data = calloc(bamfiles,sizeof(struct BAMFILE_data)); // added one extra to list to store indels for all samples combined
 
 	READQUEUE* RQ = (READQUEUE*)malloc(sizeof(READQUEUE));  RQ->first = NULL; RQ->last = NULL; RQ->reads = 0; 
-	int* fcigarlist = (int*)malloc(sizeof(int)*4096);
+	int* fcigarlist = (int*)malloc(sizeof(int)*4096*128); // increased size to work for long reads, 07-25-2023
 
 	// data structure for holding potential variants and read counts, etc 
 	struct VARIANT variant;  variant.ploidy = calloc(options->bamfiles,sizeof(int)); 
