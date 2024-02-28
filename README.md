@@ -43,13 +43,11 @@ The first step is to align the reads from the sequencing experiment to the refer
 3. The reference sequence file should be indexed using 'samtools faidx' and the index file reference.fasta.fai placed in the same directory as reference.fasta
 4. For targeted sequencing studies, it is recommended to use a bed file for variant calling. If a bedfile is not specified, the program will evaluate each base in the genome for variant calling.
 
-4. CRISP requires at least two pools to make variant calls, but at least 5 pools are ideal. CRISP should be run separately on pools sequenced on different sequencing instruments.
+4. CRISP requires at least two pools to make variant calls, but at least 5 pools are recommended. CRISP should be run separately on pools sequenced on different sequencing instruments.
 
 5. The number of haplotypes in each pool (--poolsize) is assumed to be the same. For variable poolsizes, the poolsize should be specified inn the input file with the list of bam files (see FAQ for details on the format).
-
-6. Increasing the number of permutations (from 20K to 50K-100K) can slightly improve the accuracy of variant detection at the cost of increasing running time. Choose this parameter based on the number of pools and the total target region sequenced.
-
-7. CRISP can be parallelized by calling variants on specific chromosomes (or regions) using the --regions option. This requires the bam files to be indexed. 
+   
+6. CRISP can be parallelized by calling variants on specific chromosomes (or regions) using the --regions option. This requires the bam files to be indexed. 
 
 
 Command-line arguments for CRISP
