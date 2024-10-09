@@ -36,7 +36,7 @@ extern int FAST_FILTER; // filter false variants using contingency table or chi-
 
 extern unsigned int BTI[]; // array that stores mapping of bases to integers 'A' -> 0 , 'C' -> 1, 'G' -> 2
 
-char* OUTPUT_ALLELE_COUNTS; 
+//extern char* OUTPUT_ALLELE_COUNTS; 
 
 struct OPTIONS
 {

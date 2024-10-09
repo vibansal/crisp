@@ -11,7 +11,7 @@ int parse_arguments(int argc,char* argv[],struct OPTIONS* options,char* bamfilep
 	// output command used to run  CRISP in stdout file 
 	fprintf(stdout,"##CRISP_command "); for (i=0;i<argc;i+=1)fprintf(stdout," %s",argv[i]); fprintf(stdout,"\n"); 
 
-	OUTPUT_ALLELE_COUNTS = NULL;
+	char* OUTPUT_ALLELE_COUNTS = NULL;
 	for (i=1;i<argc-1;i+=2)
 	{
 		if (strcmp(argv[i],"--ref") ==0 || strcmp(argv[i],"--reference") ==0)        strcpy(options->fastafile,argv[i+1]);

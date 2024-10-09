@@ -34,7 +34,7 @@ struct bamINDEL
         // most indels will occur in small number of samples, bogus or rare true indels | common indels -> occur in many-many samples...
 	// cigarlist 1M5I or 10I5D for complex indel uint32_t cigarlist[2];
 	// also store best cigars (left and right) for each indel
-} bamINDEL;
+};
 
 struct REALIGNMENT
 {

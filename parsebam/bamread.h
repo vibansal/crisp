@@ -40,7 +40,7 @@ struct alignedread
 	char OPE; // flag to mark reads which overlap with their mate, '0' default, '1' OPE, '2' IS is shorter than readlength
 	uint8_t realigned;
 
-} alignedread;
+};
 
 struct alignedread* get_read_bamfile(const bam1_t *b, void *data,struct alignedread* read);
 
