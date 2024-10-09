@@ -61,7 +61,7 @@ int remove_ambiguous_bases(READQUEUE* bq,struct VARIANT* variant,int HPlength,in
 			}
 		}
 	}
-        fprintf(stdout,"%d:%d_removed HP=%d,%d\t",bases_removed0,bases_removed1,HPlength,delta);
+        if (PFLAG >=1) fprintf(stdout,"%d:%d_removed HP=%d,%d\t",bases_removed0,bases_removed1,HPlength,delta);
 	return bases_removed0+bases_removed1; 
 }
 

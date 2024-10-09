@@ -103,17 +103,20 @@ int evaluate_variant(READQUEUE* bq, struct VARIANT* variant,int allele1,int alle
 
 		e01r_e10f = (double)variant->filteredreads[5]/(variant->filteredreads[5]+variant->filteredreads[6]+variant->counts[allele2+2*maxalleles]+variant->counts[allele1+2*maxalleles]+0.1);
 		e01f_e10r = (double)variant->filteredreads[6]/(variant->filteredreads[5]+variant->filteredreads[6]+variant->counts[allele2+2*maxalleles]+variant->counts[allele1+2*maxalleles]+0.1);
-		fprintf(stdout,"FL=%d,%d,E01f_E10r=%0.4f,E01r_E10f=%0.4f SPV=%0.2f:%0.2f\t",variant->filteredreads[5],variant->filteredreads[6],e01f_e10r,e01r_e10f,chi2stats[3],chi2stats[4]);
+		if (PFLAG >=1) fprintf(stdout,"FL=%d,%d,E01f_E10r=%0.4f,E01r_E10f=%0.4f SPV=%0.2f:%0.2f\t",variant->filteredreads[5],variant->filteredreads[6],e01f_e10r,e01r_e10f,chi2stats[3],chi2stats[4]);
 
 		if (allele2 >=4) 
 		{
-			fprintf(stdout,"indel %d AL:%s:%f %s:%f FET:%0.2f:%0.2f\n",allele2,variant->itb[allele2],p[0],variant->itb[allele3],p[1],pv1,pv2);
+			if (PFLAG >=1) fprintf(stdout,"indel %d AL:%s:%f %s:%f FET:%0.2f:%0.2f\n",allele2,variant->itb[allele2],p[0],variant->itb[allele3],p[1],pv1,pv2);
 			int hplength = variant->HPlength[allele2]/(strlen(variant->itb[allele2])-1);
 			if (FAST_FILTER ==1 && variant->ctpval[variant->varalleles] >= -3 && variant->ploidy[0] > 2 && hplength >= 4 && (p[0]/K) <= 0.05) return 0;
 			else if (FAST_FILTER ==1 & variant->ctpval[variant->varalleles] >= -3 && variant->ploidy[0] > 2 && hplength >= 8 && (p[0]/K) <= 0.1) return 0;
 			// special filter for indels in homopolymer runs added 10/23/13
 		}
-		else fprintf(stdout,"AL:%s:%f %s:%f FET:%0.2f:%0.2f\n",variant->itb[allele2],p[0],variant->itb[allele3],p[1],pv1,pv2);
+		else 
+		{
+			if (PFLAG >=1) fprintf(stdout,"AL:%s:%f %s:%f FET:%0.2f:%0.2f\n",variant->itb[allele2],p[0],variant->itb[allele3],p[1],pv1,pv2);
+		}
 
 		// filter low-frequency variants that are not significant using chi-square distribution test
 		if (FAST_FILTER ==1)
@@ -255,7 +258,8 @@ int newCRISPcaller(REFLIST* reflist,int current,int position,READQUEUE* bq,struc
 		}
 		if (indelflag > 0) 
 		{
-			remove_ambiguous_bases(bq,variant,indelflag,1); fprintf(stdout,"\n");
+			remove_ambiguous_bases(bq,variant,indelflag,1); 
+			if (PFLAG >=1) fprintf(stdout,"\n");
 		}
 		//if (variant->alleles[0] >= 0) print_indel_haplotypes(bq,variant,variant->alleles[0]); 
 			

@@ -1,6 +1,6 @@
 
-CC=gcc -Wall -D_GNU_SOURCE
-CFLAGS= -D_GNU_SOURCE -O2 -Wall -std=gnu99 -std=c99 -lm
+CC=gcc -Wno-all -D_GNU_SOURCE
+CFLAGS= -D_GNU_SOURCE -O2 -Wno-all -std=gnu99 -std=c99 -lm
 
 ## modify this variable to point to the location of the samtools directory in order to compile CRISP
 SAMTOOLS=samtools

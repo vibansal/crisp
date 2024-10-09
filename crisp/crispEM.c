@@ -193,11 +193,11 @@ void calculate_genotypes(struct VARIANT* variant,int allele1, int allele2, int a
 			if (ecount >= 2)
 			{
 				HWEstat += pow(genotype_counts[j]-ecount,2)/ecount; DOF +=1;
-				fprintf(stdout,"%d:%.1f:%.1f ",j,genotype_counts[j],ecount);
+				if (PFLAG >=1) fprintf(stdout,"%d:%.1f:%.1f ",j,genotype_counts[j],ecount);
 			}
 		}
 		if (HWEstat > 0 && DOF >=2) *HWEpvalue = kf_gammaq( (double)(DOF-1)/2,(double)HWEstat/2)/log(10);  else *HWEpvalue =0; 
-		fprintf(stdout,"HWEcounts %0.2f %0.0f %0.2f\n",HWEstat,DOF-1,*HWEpvalue);       
+		if (PFLAG >=1) fprintf(stdout,"HWEcounts %0.2f %0.0f %0.2f\n",HWEstat,DOF-1,*HWEpvalue);       
 	}
 	//free(genotype_counts); // check free memory here ??
 }
@@ -312,7 +312,11 @@ double EMmethod(struct VARIANT* variant,int allele1, int allele2, int allele3,do
 		p = pnew; pf = pnewf; pr = pnewr; pb = pnewb; 
 		//if (iter >=2 && fabsf(LLtotal-LLtotalprev) <= convergence_delta) break; 
 	}
-	if (iter < maxiter) fprintf(stdout,"convergence at iter %d\n",iter); else fprintf(stdout,"EM didnot converge after %d iters\n",maxiter);
+	if (PFLAG >=1)
+	{
+		if (iter < maxiter) fprintf(stdout,"convergence at iter %d\n",iter); 
+		else fprintf(stdout,"EM didnot converge after %d iters\n",maxiter);
+	}
 
         SDELTA = (LLtotalf> LLtotalr) ? LLtotalf-LLtotal-log10(2.0) : LLtotalr-LLtotal-log10(2.0); deltaf = SDELTA;
 

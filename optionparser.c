@@ -9,9 +9,11 @@ int parse_arguments(int argc,char* argv[],struct OPTIONS* options,char* bamfilep
 {
 	int i=0,bamfiles=0;
 	// output command used to run  CRISP in stdout file 
-	fprintf(stdout,"##CRISP_command "); for (i=0;i<argc;i+=1)fprintf(stdout," %s",argv[i]); fprintf(stdout,"\n"); 
+	fprintf(stderr,"##CRISP_command_line "); 
+	for (i=0;i<argc;i+=1)fprintf(stderr," %s",argv[i]); fprintf(stderr,"\n"); 
 
 	char* OUTPUT_ALLELE_COUNTS = NULL;
+	PFLAG=0;
 	for (i=1;i<argc-1;i+=2)
 	{
 		if (strcmp(argv[i],"--ref") ==0 || strcmp(argv[i],"--reference") ==0)        strcpy(options->fastafile,argv[i+1]);
