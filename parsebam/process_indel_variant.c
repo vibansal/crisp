@@ -94,8 +94,12 @@ int calculate_indel_ambiguity(struct VARIANT* variant,REFLIST* reflist,int curre
 // we need to go through the baselist and identify the three most common indel alleles and instantiate them in variant->itb
 int identify_indelalleles(REFLIST* reflist,int current,READQUEUE* bq, struct VARIANT* variant)
 {
-	struct INDEL* indelalleles = (struct INDEL*)malloc(sizeof(struct INDEL)*10); int alleles =0;
-	int offset=0; int i=0,j=0,k=0;int flag =0; int varalleles = 0; int discard=0; int match=0;
+	struct INDEL* indelalleles = (struct INDEL*)malloc(sizeof(struct INDEL)*10); 
+	int alleles =0; // number of indel alleles
+	int offset=0; int i=0,j=0,k=0;
+	int flag =0; 
+	int varalleles = 0; // final number of indel alleles identified
+	int discard=0; int match=0;
 	struct alignedread* bcall = bq->first; 
 	for (bcall = bq->first; bcall != NULL && bcall->position <= variant->position; bcall = bcall->next)
 	{
@@ -148,16 +152,26 @@ int identify_indelalleles(REFLIST* reflist,int current,READQUEUE* bq, struct VAR
 			}
 		}
 	}
-
-	if (alleles > 1) qsort(indelalleles,alleles,sizeof(struct INDEL),indel_cmp);
-	if (indelalleles[0].reads < 3) 
+	if (alleles ==0)  return 0; // no indel alleles detected, nothing to deallocate, fix 10-09-2024
+	if (alleles > 1) qsort(indelalleles,alleles,sizeof(struct INDEL),indel_cmp); 
+	if (indelalleles[0].reads < 3) // first indel allele has less than three reads, ignore
 	{
 		for (i=0;i<alleles;i++) free(indelalleles[i].bases); free(indelalleles);
 		return 0;
 	}
-	varalleles =1; strcpy(variant->itb[4],indelalleles[0].bases); 
-	if (alleles >=2  && indelalleles[1].reads >=3) { strcpy(variant->itb[5],indelalleles[1].bases);	varalleles++; }
-	if (alleles >=3  && indelalleles[2].reads >=3) { strcpy(variant->itb[6],indelalleles[2].bases); varalleles++; }
+
+	varalleles =1; 
+	strcpy(variant->itb[4],indelalleles[0].bases); 
+	if (alleles >=2  && indelalleles[1].reads >=3) 
+	{ 
+		strcpy(variant->itb[5],indelalleles[1].bases);	
+		varalleles++; 
+	}
+	if (alleles >=3  && indelalleles[2].reads >=3) 
+	{ 
+		strcpy(variant->itb[6],indelalleles[2].bases); 
+		varalleles++; 
+	}
 
 	// add counts for indel alleles to variant->counts and variant->indcounts
 	for (bcall = bq->first; bcall != NULL && bcall->position <= variant->position; bcall = bcall->next)
@@ -177,9 +191,6 @@ int identify_indelalleles(REFLIST* reflist,int current,READQUEUE* bq, struct VAR
 				{
 					variant->counts[4+offset+k]++; variant->indcounts[bcall->sampleid][4+offset+k]++; 
 				}
-				//if (bcall->bidir =='1') variant->indcounts[bcall->sampleid][4+k+2*maxalleles]++;
-				//variant->indcounts[bcall->sampleid][3*maxalleles+4+k]++;
-
 				if ((bcall->flag & BAM_PAIRED_READ1) == BAM_PAIRED_READ1) variant->indcounts_binned[bcall->sampleid][4+offset+k][3]++;
 				else if ((bcall->flag & BAM_PAIRED_READ2)== BAM_PAIRED_READ2 ) variant->indcounts_binned[bcall->sampleid][4+offset+k][4]++;
 				else variant->indcounts_binned[bcall->sampleid][4+offset+k][5]++;
@@ -187,13 +198,6 @@ int identify_indelalleles(REFLIST* reflist,int current,READQUEUE* bq, struct VAR
 				k = varalleles; 
 			}
 		}
-	}
-	if (varalleles >= 2) 
-	{
-		//if (PFLAG >=2) fprintf(stdout,"pos %d ",variant->position+1);
-		//fprintf(stderr,"%s:%d:%d  ",indelalleles[0].bases,indelalleles[0].length,indelalleles[0].reads);
-		//fprintf(stderr,"%s:%d:%d \t",indelalleles[1].bases,indelalleles[1].length,indelalleles[1].reads);
-		//if (PFLAG >=2) fprintf(stdout ," allele1 %s:%d:%d allele2 %s:%d:%d\n",variant->itb[4],variant->counts[4],variant->counts[4+maxalleles],variant->itb[5],variant->counts[5],variant->counts[5+maxalleles]);
 	}
 	for (i=0;i<alleles;i++) free(indelalleles[i].bases); free(indelalleles);
 	return varalleles;
