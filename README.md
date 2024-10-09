@@ -19,10 +19,11 @@ Introduction:
 CRISP is a software program to detect SNPs and short indels from pooled sequencing data. CRISP is designed to detect both rare and common variants by utilizing sequence reads from next-generation sequencing of multiple DNA pools. CRISP uses a cross-pool comparison approach to distinguish sequencing errors from rare variants. Note that the method is not designed for variant detection from a single pool. CRISP has been evaluated on several pooled sequencing datasets (human and bacterial) generated using the Illumina sequencing platform. In principle, it should work for sequence data from other sequencing platforms. The method requires each pool to be sequenced using the same sequencing platform. 
 
 
-Implementation
+
+Installation
 =============
 
-CRISP is implemented in C and uses the SAMtools API for reading BAM files. 
+CRISP is implemented in C and uses the SAMtools API for reading BAM files. The source code for samtools is included in the source code (subdirectory samtools). Samtools requires certain libraries (libncurses-dev) to compile. Typing "make all" should compile both samtools and the CRISP source code. The compiled executable 'CRISP.binary' should be in the 'bin' subfolder. CRISP has been tested on Debian & Ubuntu Linux.  
 
 
 Running CRISP:
