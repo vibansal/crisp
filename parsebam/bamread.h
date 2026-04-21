@@ -7,7 +7,8 @@
 #include<time.h>
 #include<string.h>
 #include<ctype.h>
-#include "sam.h" // samtools header file for bam definitions
+#include <htslib/sam.h>  // htslib for BAM/CRAM support
+#include <htslib/hts.h>
 #include "readfasta.h"
 
 extern char INT_CIGAROP[];
@@ -42,7 +43,7 @@ struct alignedread
 
 };
 
-struct alignedread* get_read_bamfile(const bam1_t *b, void *data,struct alignedread* read);
+struct alignedread* get_read_bamfile(const bam1_t *b, sam_hdr_t *hdr, struct alignedread* read);
 
 int parse_cigar(struct alignedread* read,REFLIST* reflist,int current,int* fcigarlist);//int sample_id);
 

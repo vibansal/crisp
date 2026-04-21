@@ -50,7 +50,7 @@ void printpileup(REFLIST* reflist,int current,int k,READQUEUE* bq)
 	printf("\n");
 }
 
-int free_read_queue(READQUEUE* bq,struct BAMFILE_data* bamfiles_data) //free read pointed to by RQ->iter, previous is RQ->previous
+void free_read_queue(READQUEUE* bq,struct BAMFILE_data* bamfiles_data) //free read pointed to by RQ->iter, previous is RQ->previous
 {
 	// update queue pointers for the pool 'i'
 	//fprintf(stdout,"free %d\n",bq->reads);
@@ -121,22 +121,43 @@ int allocate_mem_heap(struct BAMFILE_data* bamfiles_data,int bamfiles,int heapsi
 }
 
 
-int init_bamfiles(struct BAMFILE_data* bamfiles_data,char** bamfilelist,int bamfiles,char* regions,int* reference,int* startpos,int* endpos)
+int init_bamfiles(struct BAMFILE_data* bamfiles_data,char** bamfilelist,int bamfiles,char* regions,int* reference,int* startpos,int* endpos,char* reference_fasta)
 {
 	int ref=-1,beg=0,end=0,i=0,finishedfiles=0;
+	hts_pos_t beg_pos=0, end_pos=0;
         for (i=0;i<bamfiles;i++)
         {
                 bamfiles_data[i].first=NULL; bamfiles_data[i].last=NULL;bamfiles_data[i].previous=NULL;
-                if ((bamfiles_data[i].fp = samopen(bamfilelist[i], "rb", 0)) == 0) 
+                bamfiles_data[i].iter = NULL;
+                if ((bamfiles_data[i].fp = hts_open(bamfilelist[i], "r")) == NULL)
                 {
-                        fprintf(stderr, "unable to open the BAM file %s\n", bamfilelist[i]);  exit(0);
+                        fprintf(stderr, "unable to open the BAM/CRAM file %s\n", bamfilelist[i]);  exit(0);
                 }
-                if (regions == NULL) 
+                // Read the header
+                bamfiles_data[i].hdr = sam_hdr_read(bamfiles_data[i].fp);
+                if (bamfiles_data[i].hdr == NULL)
+                {
+                        fprintf(stderr, "unable to read header from file %s\n", bamfilelist[i]);  exit(0);
+                }
+                // Set reference for CRAM files
+                if (bamfiles_data[i].fp->format.format == cram && reference_fasta != NULL)
+                {
+                        if (hts_set_fai_filename(bamfiles_data[i].fp, reference_fasta) != 0)
+                        {
+                                fprintf(stderr, "warning: failed to set reference for CRAM file %s\n", bamfilelist[i]);
+                        }
+                }
+                else if (bamfiles_data[i].fp->format.format == cram && reference_fasta == NULL)
+                {
+                        fprintf(stderr, "error: CRAM file %s requires a reference FASTA (--ref)\n", bamfilelist[i]);
+                        exit(1);
+                }
+                if (regions == NULL)
                 {
                         bamfiles_data[i].b = bam_init1();
-                        if (samread(bamfiles_data[i].fp,bamfiles_data[i].b) >=0)
+                        if (sam_read1(bamfiles_data[i].fp, bamfiles_data[i].hdr, bamfiles_data[i].b) >=0)
                         {
-                                bamfiles_data[i].read = get_read_bamfile(bamfiles_data[i].b,bamfiles_data[i].fp,bamfiles_data[i].read);
+                                bamfiles_data[i].read = get_read_bamfile(bamfiles_data[i].b, bamfiles_data[i].hdr, bamfiles_data[i].read);
                                 bamfiles_data[i].read->sampleid = i;
                         }
                         else
@@ -144,41 +165,41 @@ int init_bamfiles(struct BAMFILE_data* bamfiles_data,char** bamfilelist,int bamf
                                 bamfiles_data[i].finished = 1; finishedfiles++; bamfiles_data[i].read= NULL;
                         }
                 }
-		else // load BAM index and find region 
+		else // load BAM/CRAM index and find region
                 {
-                        if ( (bamfiles_data[i].idx  = bam_index_load(bamfilelist[i])) ==0) 
+                        if ( (bamfiles_data[i].idx = sam_index_load(bamfiles_data[i].fp, bamfilelist[i])) == NULL)
                         {
-                                fprintf(stderr,"unable to load bam index for file %s\n",bamfilelist[i]); exit(0);
+                                fprintf(stderr,"unable to load index for file %s\n",bamfilelist[i]); exit(0);
                         }
-                        bam_parse_region(bamfiles_data[i].fp->header,regions,&ref,&beg,&end); 
-                        if (ref < 0)
+                        if (sam_parse_region(bamfiles_data[i].hdr, regions, &ref, &beg_pos, &end_pos, 0) < 0)
                         {
                                 fprintf(stderr,"invalid region for bam file %s \n",regions); exit(0);
                         }
+                        beg = (int)beg_pos; end = (int)end_pos;
                         bamfiles_data[i].b = bam_init1();
-                        bamfiles_data[i].iter = bam_iter_query(bamfiles_data[i].idx,ref,beg,end);
+                        bamfiles_data[i].iter = sam_itr_queryi(bamfiles_data[i].idx, ref, beg, end);
 			//if (i==0) fprintf(stderr,"region argument %s %d:%d:%d\n",regions,ref,beg,end);
-                        if ( (bamfiles_data[i].ret = bam_iter_read(bamfiles_data[i].fp->x.bam,bamfiles_data[i].iter,bamfiles_data[i].b)) >=0)
+                        if ( (bamfiles_data[i].ret = sam_itr_next(bamfiles_data[i].fp, bamfiles_data[i].iter, bamfiles_data[i].b)) >=0)
                         {
-                                if (i==0 || i+1 == bamfiles) fprintf(stderr,"reading bam file index: %s.bai region %d:%d-%d\n",bamfilelist[i],ref,beg,end);
-                                bamfiles_data[i].read = get_read_bamfile(bamfiles_data[i].b,bamfiles_data[i].fp,bamfiles_data[i].read);
+                                if (i==0 || i+1 == bamfiles) fprintf(stderr,"reading bam/cram file index: %s region %d:%d-%d\n",bamfilelist[i],ref,beg,end);
+                                bamfiles_data[i].read = get_read_bamfile(bamfiles_data[i].b, bamfiles_data[i].hdr, bamfiles_data[i].read);
                                 bamfiles_data[i].read->sampleid = i;
 
                         }
                         else
                         {
                                 bamfiles_data[i].finished = 1; finishedfiles++; bamfiles_data[i].read= NULL;
-                                bam_iter_destroy(bamfiles_data[i].iter); bam_destroy1(bamfiles_data[i].b); bam_index_destroy(bamfiles_data[i].idx);
+                                hts_itr_destroy(bamfiles_data[i].iter); bam_destroy1(bamfiles_data[i].b); hts_idx_destroy(bamfiles_data[i].idx);
                         }
                 }
         }
 	*reference = ref; *startpos = beg; *endpos = end;
-	fprintf(stderr,"finished reading bam file indexes \n");
+	fprintf(stderr,"finished reading bam/cram file indexes \n");
 	int j=0,k=0;
-	for (i=0;i<bamfiles;i++)	
+	for (i=0;i<bamfiles;i++)
 	{
 		bamfiles_data[i].counts = calloc(64,sizeof(int*)); for (j=0;j<64;j++) bamfiles_data[i].counts[j] = calloc(8,sizeof(int));
-		for (j=0;j<64;j++) { for (k=0;k<8;k++) bamfiles_data[i].counts[j][k] = 0; } 
+		for (j=0;j<64;j++) { for (k=0;k<8;k++) bamfiles_data[i].counts[j][k] = 0; }
 	}
 
 	return 1;

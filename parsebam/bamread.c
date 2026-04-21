@@ -76,10 +76,10 @@ int parse_cigar(struct alignedread* read,REFLIST* reflist,int current,int* fciga
 }
 
 // b is full bam record, c is core alignment record
-// data is pointer to bamfile
-struct alignedread* get_read_bamfile(const bam1_t *b, void *data,struct alignedread* read)
+// hdr is pointer to BAM/CRAM header
+struct alignedread* get_read_bamfile(const bam1_t *b, sam_hdr_t *hdr, struct alignedread* read)
 {
-	samfile_t *fp = (samfile_t*)data; uint32_t *cigar = bam1_cigar(b);  const bam1_core_t *c = &b->core;
+	uint32_t *cigar = bam_get_cigar(b);  const bam1_core_t *c = &b->core;
 	//	if (c->flag & (BAM_FUNMAP|BAM_FSECONDARY|BAM_FQCFAIL|BAM_FDUP)) return 0; /* skip unmapped reads  remove this filter */
 	// CIGAR array: lower 4 bits encode CIGAR operation and higher 28 bits keep length of cigar 
 	read = (struct alignedread*)malloc(sizeof(struct alignedread)); 
@@ -114,13 +114,13 @@ struct alignedread* get_read_bamfile(const bam1_t *b, void *data,struct alignedr
 	//if (read->readid[c->l_qname-3] =='/') read->readid[i-3]='\0';
 	//fprintf(stdout,"ql %d %s \n",c->l_qname,read->readid);
 
-	if (c->tid >= 0) read->chrom = fp->header->target_name[c->tid]; else read->chrom = NULL; 
+	if (c->tid >= 0) read->chrom = (char*)sam_hdr_tid2name(hdr, c->tid); else read->chrom = NULL;
 	read->tid = c->tid;
-	if (c->mtid >= 0) read->matechrom = fp->header->target_name[c->mtid]; else read->matechrom = NULL;
+	if (c->mtid >= 0) read->matechrom = (char*)sam_hdr_tid2name(hdr, c->mtid); else read->matechrom = NULL;
 
-	// sequence, quality XM, NM 	
-	uint8_t* sequence = bam1_seq(b); uint8_t* quality = bam1_qual(b);
-	for (i=0;i<b->core.l_qseq;i++) read->sequence[i] = bam_nt16_rev_table[bam1_seqi(sequence,i)]; read->sequence[i] = '\0';
+	// sequence, quality XM, NM
+	uint8_t* sequence = bam_get_seq(b); uint8_t* quality = bam_get_qual(b);
+	for (i=0;i<b->core.l_qseq;i++) read->sequence[i] = seq_nt16_str[bam_seqi(sequence,i)]; read->sequence[i] = '\0';
 	for (i=0;i<b->core.l_qseq;i++) read->quality[i] = (char)(quality[i]+33); read->quality[i] = '\0';
 
 	read->XC = 0;
@@ -154,6 +154,7 @@ struct alignedread* get_read_bamfile(const bam1_t *b, void *data,struct alignedr
 void free_read(struct alignedread* read)
 {
 	if (read->matepair != NULL) (read->matepair)->matepair = NULL; 
-	free(read->sequence);free(read->quality);free(read->readid); free(read->cigarlist); free(read);
+	free(read->sequence);free(read->quality);free(read->readid); free(read->cigarlist); 
 	if (read->fcigs > 0) free(read->fcigarlist);
+	free(read);
 }

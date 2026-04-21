@@ -110,7 +110,7 @@ int evaluate_variant(READQUEUE* bq, struct VARIANT* variant,int allele1,int alle
 			if (PFLAG >=1) fprintf(stdout,"indel %d AL:%s:%f %s:%f FET:%0.2f:%0.2f\n",allele2,variant->itb[allele2],p[0],variant->itb[allele3],p[1],pv1,pv2);
 			int hplength = variant->HPlength[allele2]/(strlen(variant->itb[allele2])-1);
 			if (FAST_FILTER ==1 && variant->ctpval[variant->varalleles] >= -3 && variant->ploidy[0] > 2 && hplength >= 4 && (p[0]/K) <= 0.05) return 0;
-			else if (FAST_FILTER ==1 & variant->ctpval[variant->varalleles] >= -3 && variant->ploidy[0] > 2 && hplength >= 8 && (p[0]/K) <= 0.1) return 0;
+			else if (FAST_FILTER ==1 && variant->ctpval[variant->varalleles] >= -3 && variant->ploidy[0] > 2 && hplength >= 8 && (p[0]/K) <= 0.1) return 0;
 			// special filter for indels in homopolymer runs added 10/23/13
 		}
 		else 

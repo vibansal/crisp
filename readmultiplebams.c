@@ -76,7 +76,8 @@ int multisampleVC(struct OPTIONS* options,REFLIST* reflist,FILE* fp)
 	struct alignedread* pread = NULL;
 	struct BAMFILE_data* bamfiles_data = calloc(bamfiles,sizeof(struct BAMFILE_data)); // added one extra to list to store indels for all samples combined
 
-	READQUEUE* RQ = (READQUEUE*)malloc(sizeof(READQUEUE));  RQ->first = NULL; RQ->last = NULL; RQ->reads = 0; 
+	READQUEUE* RQ = (READQUEUE*)malloc(sizeof(READQUEUE));  
+	RQ->first = NULL; RQ->last = NULL; RQ->reads = 0; 
 	int* fcigarlist = (int*)malloc(sizeof(int)*4096*128); // increased size to work for long reads, 07-25-2023
 
 	// data structure for holding potential variants and read counts, etc 
@@ -90,7 +91,7 @@ int multisampleVC(struct OPTIONS* options,REFLIST* reflist,FILE* fp)
 	
 	reflist->cinterval = -1; // first interval to the right of current base
 
-        init_bamfiles(bamfiles_data,options->bamfilelist,bamfiles,options->regions,&options->targettid,&options->targetstart,&options->targetend);
+        init_bamfiles(bamfiles_data,options->bamfilelist,bamfiles,options->regions,&options->targettid,&options->targetstart,&options->targetend,options->fastafile);
 
 	// error when reading indexed bam files probably due to lack of reads in some files resulting in heap error, fixed oct 17 2012
         j=0; for (i=0;i<bamfiles;i++) 
@@ -193,11 +194,11 @@ int multisampleVC(struct OPTIONS* options,REFLIST* reflist,FILE* fp)
 		else free_read(bamfiles_data[i].read);
 		//fprintf(stdout,"read from %d %d %s\n",i,bamfiles_data[i].read->position,bamfiles_data[i].read->readid);
 
-		if (options->regions ==NULL) rf =samread(bamfiles_data[i].fp,bamfiles_data[i].b);
-		else rf  = bam_iter_read(bamfiles_data[i].fp->x.bam,bamfiles_data[i].iter,bamfiles_data[i].b);
+		if (options->regions ==NULL) rf = sam_read1(bamfiles_data[i].fp, bamfiles_data[i].hdr, bamfiles_data[i].b);
+		else rf = sam_itr_next(bamfiles_data[i].fp, bamfiles_data[i].iter, bamfiles_data[i].b);
 		if (rf >=0)
 		{
-			bamfiles_data[i].read = get_read_bamfile(bamfiles_data[i].b,bamfiles_data[i].fp,pread); 
+			bamfiles_data[i].read = get_read_bamfile(bamfiles_data[i].b, bamfiles_data[i].hdr, pread); 
 			//if (options->samples ==0) bamfiles_data[i].read->sampleid = i;
 			//else bamfiles_data[i].read->sampleid = options->BAM_TO_SAMPLE[i];  
 			// bug here june 30 2013 commented out .... in 12 T2D pools 

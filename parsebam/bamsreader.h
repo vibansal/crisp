@@ -7,7 +7,8 @@
 #include<time.h>
 #include<string.h>
 #include<ctype.h>
-#include "sam.h" // samtools header file for bam definitions
+#include <htslib/sam.h>  // htslib for BAM/CRAM support
+#include <htslib/hts.h>
 #include "readfasta.h"
 #include "bamread.h"
 
@@ -66,28 +67,28 @@ struct BASE_COUNTS
 //int parse_cigar(struct alignedread* read,REFLIST* reflist,int current,int* fcigarlist,int sample_id);
 //struct alignedread* get_read_bamfile(const bam1_t *b, void *data,struct alignedread* read);
 
-// data structures and bam pointers associated with each bam file 
+// data structures and bam pointers associated with each bam file
 struct BAMFILE_data
 {
-	bam_index_t *idx; // bam file index
-	bam_iter_t iter; int ret; // for reading indexed bam files 
+	hts_idx_t *idx; // bam/cram file index
+	hts_itr_t *iter; int ret; // for reading indexed bam/cram files
 
-	struct alignedread* read;   samfile_t* fp;  bam1_t* b; 
-	int finished;   int readflag; 
+	struct alignedread* read;   htsFile* fp;  sam_hdr_t* hdr;  bam1_t* b;
+	int finished;   int readflag;
 	struct alignedread* first; struct alignedread* last; //pointers to first and last read in queue
 	struct alignedread* previous; //
 	struct INDELHEAP* ilist; // list of candidate indels found in this bam file 10/24/13
-	int** counts; 
-	//struct alignedread* *OPEheap; int heaplength; 
-	// declare an array of pointers to alignedread object as heap (nov 19 2012), int length of pqueue 
+	int** counts;
+	//struct alignedread* *OPEheap; int heaplength;
+	// declare an array of pointers to alignedread object as heap (nov 19 2012), int length of pqueue
 	// dynamic re-allocation of memory if the size goes above what is allocated initially...
 } ;
 
-int free_read_queue(READQUEUE* RQ,struct BAMFILE_data* bamfiles_data); //free read pointed to by RQ->iter, previous is RQ->previous
+void free_read_queue(READQUEUE* RQ,struct BAMFILE_data* bamfiles_data); //free read pointed to by RQ->iter, previous is RQ->previous
 
 void empty_queue(READQUEUE* bq,struct BAMFILE_data* bamfiles_data);
 
-int init_bamfiles(struct BAMFILE_data* bamfiles_data,char** bamfilelist,int bamfiles,char* regions,int* ref,int* start,int* end);
+int init_bamfiles(struct BAMFILE_data* bamfiles_data,char** bamfilelist,int bamfiles,char* regions,int* ref,int* start,int* end,char* reference_fasta);
 
 //void free_read(struct alignedread* read);
 

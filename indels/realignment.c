@@ -210,7 +210,8 @@ int realignread_RL(struct alignedread* read,REFLIST* reflist,struct bamINDEL* ba
 	//printf(" %s readpos %d indel %d length %d ct %d end %d \n",read->readid,read->position,bam_indel->position,bam_indel->length,bam_indel->counts[0],read->span+read->position);
 	bam_indel->simple = '1';
 	
-	int firstposition = 0; op = read->cigarlist[0]&0xf;  ol = 0>>4;
+	int firstposition = 0; 
+	op = read->cigarlist[0]&0xf;  ol = 0>>4;
 	if ( (read->flag &16) ==16 && op == BAM_CSOFT_CLIP) firstposition = read->XC+1;  
 	// if read->XC is non zero then we cannot extend the alignment into the clipped region (XC is # low quality bases clipped by BWA)
 
