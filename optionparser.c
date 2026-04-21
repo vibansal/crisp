@@ -160,7 +160,7 @@ int parse_bamfilenames(char* bamfilepaths,struct OPTIONS* options)
 		options->bamfilelist[i] = calloc(sizeof(char),(j-s+1));
 		for (k=s;k<j;k++) options->bamfilelist[i][k-s] = buffer[k]; options->bamfilelist[i][k-s] ='\0';
 
-		if (buffer[j] == '\n') continue; // nothing there
+		if (buffer[j] == '\n') { options->sampleids[i] = NULL; continue; } // nothing there
 
 		while (buffer[j] == ' ' || buffer[j] == '\t') j++; s = j; // empty spaces 
 		while (buffer[j]  != '\t' && buffer[j] != '\n' && buffer[j] !=' ') j++; 
@@ -234,7 +234,7 @@ int optparser(int argc, char* argv[],struct OPTIONS* options)
 	strcpy(options->fastafile,"None"); strcpy(options->bedfile,"None"); strcpy(options->vcffile,"None");
 	strcpy(options->indelfile,"None");
 	options->bamfiles =0; options->READLENGTH = 0; options->varpoolsize = 0; // variable pool size 0/1
-	options->regions = NULL; options->samples =0; options->bamfiles =0; options->use_rg_sm = 0;
+	options->regions = NULL; options->samples =0; options->bamfiles =0; options->use_rg_sm = 0; options->sampleids = NULL;
 	//else if (strcmp(argv[i],"--variantcallingmodel")==0 || strcmp(argv[i],"--model") == 0) PICALL = atoi(argv[i+1]); 
 	// picall = 0 = pooled, picall = 1 = picall, picall = 2 = lowcoverage
 	if (argc >= 2 && (strcmp(argv[1],"-h") ==0 || strcmp(argv[1],"--help") ==0))   

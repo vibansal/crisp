@@ -306,8 +306,20 @@ void print_crispheader(struct OPTIONS* options)
 	fprintf(vfile,"##FORMAT=<ID=ADf,Number=.,Type=Integer,Description=\"Number of reads aligned to the forward strand of the genome supporting reference allele and the alternate alleles in the order listed\">\n");
 	fprintf(vfile,"##FORMAT=<ID=ADr,Number=.,Type=Integer,Description=\"Number of reads aligned to the reverse strand of the genome supporting reference allele and the alternate alleles in the order listed\">\n");
 	fprintf(options->vfile,"#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t");
-	for (i=0;i<options->bamfiles-1;i++) fprintf(options->vfile,"%s\t",options->bamfilelist[i]);
-	fprintf(options->vfile,"%s\n",options->bamfilelist[options->bamfiles-1]);
+	for (i=0;i<options->bamfiles;i++)
+	{
+		if (options->sampleids != NULL && options->sampleids[i] != NULL)
+			fprintf(options->vfile, "%s", options->sampleids[i]);
+		else
+		{
+			int s = strlen(options->bamfilelist[i])-1; int j = s+1;
+			while (options->bamfilelist[i][s] != '/' && s > 0) s--; s++;
+			int e = s; while (options->bamfilelist[i][e] != '.' && e < j) e++;
+			if (e <= s) e = j;
+			for (j=s;j<e;j++) fprintf(options->vfile,"%c",options->bamfilelist[i][j]);
+		}
+		if (i < options->bamfiles-1) fprintf(options->vfile,"\t"); else fprintf(options->vfile,"\n");
+	}
 
 }
 

@@ -169,9 +169,15 @@ int init_bamfiles(struct BAMFILE_data* bamfiles_data,char** bamfilelist,int bamf
                                 if (reflist->tid_map[t] == -1)
                                         fprintf(stderr, "warning: BAM contig '%s' not found in reference FASTA\n", bam_name);
                                 else if (sam_hdr_tid2len(bamfiles_data[i].hdr, t) != (hts_pos_t)reflist->lengths[reflist->tid_map[t]])
-                                        fprintf(stderr, "warning: length mismatch for '%s': BAM header %d vs FASTA index %d\n",
+                                {
+                                        fprintf(stderr, "error: length mismatch for contig '%s': BAM header %d vs FASTA index %d -- please check that the reference FASTA matches the one used for alignment\n",
                                                 bam_name, (int)sam_hdr_tid2len(bamfiles_data[i].hdr, t), reflist->lengths[reflist->tid_map[t]]);
+                                        exit(1);
+                                }
                         }
+                        if (n < reflist->ns)
+                                fprintf(stderr, "warning: BAM header has %d sequence(s), reference FASTA has %d -- %d contig(s) in FASTA will not be processed\n",
+                                        n, reflist->ns, reflist->ns - n);
                 }
                 if (regions == NULL)
                 {

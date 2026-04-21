@@ -31,7 +31,7 @@ indel: include/readfasta.o include/bamsreader.o include/variant.o include/allele
 
 ### shared objects ###
 
-include/newcrispcaller.o:	crisp/newcrispcaller.c crisp/crispcaller.h FET/contables.h parsebam/variant.h parsebam/bamsreader.h parsebam/bamread.h crisp/crispEM.c FET/pooledFET.c crisp/newcrispprint.c
+include/newcrispcaller.o:	crisp/newcrispcaller.c crisp/crispcaller.h FET/contables.h parsebam/variant.h parsebam/bamsreader.h parsebam/bamread.h crisp/crispEM.c FET/pooledFET.c crisp/newcrispprint.c crisp/crisp_header_options.c
 	$(CC) -Iparsebam $(HTSLIB_CFLAGS) -c crisp/newcrispcaller.c -o include/newcrispcaller.o
 
 include/variant.o: parsebam/variant.c parsebam/variant.h parsebam/bamsreader.h parsebam/bamsreader.c parsebam/readfasta.h parsebam/readfasta.c parsebam/process_indel_variant.c

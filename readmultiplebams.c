@@ -265,6 +265,7 @@ static void fill_sampleids_from_rg_sm(struct OPTIONS* options)
 			ks_free(&sm); sam_hdr_destroy(hdr); hts_close(f); continue;
 		}
 		options->sampleids[i] = strdup(sm.s);
+		//fprintf(stderr,"reading bam headers to get sample names %s\n",options->sampleids[i]);
 		// warn if any other @RG line has a different SM
 		for (t=1;t<n;t++)
 		{
