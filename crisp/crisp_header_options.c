@@ -1,19 +1,23 @@
 
 void print_sampleids(struct OPTIONS* options)
 {
-	// need to extract the bam file path (strip the path and .bam from file name)...
-	int i=0,s=0, e=0,j=0;
-	for (i=0;i<options->bamfiles;i++) 
+	int i=0,s=0,e=0,j=0;
+	for (i=0;i<options->bamfiles;i++)
 	{
-		s = strlen(options->bamfilelist[i])-1; j= s+1; 
-		while (options->bamfilelist[i][s] != '/' && s >0) s--; s++;  // go backwards to find first '/' character 
-		e = s; while (options->bamfilelist[i][e] != '.' && e <j ) e++; // go forward to find first '.' character 
-		if (e <= s) e = j;
-		if (e > s) 
+		if (options->sampleids != NULL && options->sampleids[i] != NULL)
 		{
-			for (j=s;j<e;j++) fprintf(options->vfile,"%c",options->bamfilelist[i][j]);  // print string between them
+			fprintf(options->vfile,"%s",options->sampleids[i]);
 		}
-		else fprintf(options->vfile,"%s",options->bamfilelist[i]);
+		else
+		{
+			// derive from BAM file path: strip directory and extension
+			s = strlen(options->bamfilelist[i])-1; j= s+1;
+			while (options->bamfilelist[i][s] != '/' && s >0) s--; s++;
+			e = s; while (options->bamfilelist[i][e] != '.' && e <j ) e++;
+			if (e <= s) e = j;
+			if (e > s) for (j=s;j<e;j++) fprintf(options->vfile,"%c",options->bamfilelist[i][j]);
+			else fprintf(options->vfile,"%s",options->bamfilelist[i]);
+		}
 		if (i < options->bamfiles-1) fprintf(options->vfile,"\t"); else fprintf(options->vfile,"\n");
 	}
 }

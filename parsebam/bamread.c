@@ -77,7 +77,7 @@ int parse_cigar(struct alignedread* read,REFLIST* reflist,int current,int* fciga
 
 // b is full bam record, c is core alignment record
 // hdr is pointer to BAM/CRAM header
-struct alignedread* get_read_bamfile(const bam1_t *b, sam_hdr_t *hdr, struct alignedread* read)
+struct alignedread* get_read_bamfile(const bam1_t *b, sam_hdr_t *hdr, struct alignedread* read, int* tid_map, int n_tid)
 {
 	uint32_t *cigar = bam_get_cigar(b);  const bam1_core_t *c = &b->core;
 	//	if (c->flag & (BAM_FUNMAP|BAM_FSECONDARY|BAM_FQCFAIL|BAM_FDUP)) return 0; /* skip unmapped reads  remove this filter */
@@ -115,7 +115,7 @@ struct alignedread* get_read_bamfile(const bam1_t *b, sam_hdr_t *hdr, struct ali
 	//fprintf(stdout,"ql %d %s \n",c->l_qname,read->readid);
 
 	if (c->tid >= 0) read->chrom = (char*)sam_hdr_tid2name(hdr, c->tid); else read->chrom = NULL;
-	read->tid = c->tid;
+	read->tid = (c->tid >= 0 && c->tid < n_tid) ? tid_map[c->tid] : c->tid;
 	if (c->mtid >= 0) read->matechrom = (char*)sam_hdr_tid2name(hdr, c->mtid); else read->matechrom = NULL;
 
 	// sequence, quality XM, NM

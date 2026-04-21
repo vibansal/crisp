@@ -121,7 +121,7 @@ int allocate_mem_heap(struct BAMFILE_data* bamfiles_data,int bamfiles,int heapsi
 }
 
 
-int init_bamfiles(struct BAMFILE_data* bamfiles_data,char** bamfilelist,int bamfiles,char* regions,int* reference,int* startpos,int* endpos,char* reference_fasta)
+int init_bamfiles(struct BAMFILE_data* bamfiles_data,char** bamfilelist,int bamfiles,char* regions,int* reference,int* startpos,int* endpos,char* reference_fasta,REFLIST* reflist)
 {
 	int ref=-1,beg=0,end=0,i=0,finishedfiles=0;
 	hts_pos_t beg_pos=0, end_pos=0;
@@ -152,12 +152,33 @@ int init_bamfiles(struct BAMFILE_data* bamfiles_data,char** bamfilelist,int bamf
                         fprintf(stderr, "error: CRAM file %s requires a reference FASTA (--ref)\n", bamfilelist[i]);
                         exit(1);
                 }
+                // Build tid->reflist index map from the first BAM header; verify length consistency for all files
+                if (i == 0)
+                {
+                        int n = sam_hdr_nref(bamfiles_data[i].hdr); int t=0,r=0;
+                        reflist->n_tid = n;
+                        reflist->tid_map = (int*)malloc(n * sizeof(int));
+                        for (t=0;t<n;t++)
+                        {
+                                const char* bam_name = sam_hdr_tid2name(bamfiles_data[i].hdr, t);
+                                reflist->tid_map[t] = -1;
+                                for (r=0;r<reflist->ns;r++)
+                                {
+                                        if (strcmp(bam_name, reflist->names[r]) == 0) { reflist->tid_map[t] = r; break; }
+                                }
+                                if (reflist->tid_map[t] == -1)
+                                        fprintf(stderr, "warning: BAM contig '%s' not found in reference FASTA\n", bam_name);
+                                else if (sam_hdr_tid2len(bamfiles_data[i].hdr, t) != (hts_pos_t)reflist->lengths[reflist->tid_map[t]])
+                                        fprintf(stderr, "warning: length mismatch for '%s': BAM header %d vs FASTA index %d\n",
+                                                bam_name, (int)sam_hdr_tid2len(bamfiles_data[i].hdr, t), reflist->lengths[reflist->tid_map[t]]);
+                        }
+                }
                 if (regions == NULL)
                 {
                         bamfiles_data[i].b = bam_init1();
                         if (sam_read1(bamfiles_data[i].fp, bamfiles_data[i].hdr, bamfiles_data[i].b) >=0)
                         {
-                                bamfiles_data[i].read = get_read_bamfile(bamfiles_data[i].b, bamfiles_data[i].hdr, bamfiles_data[i].read);
+                                bamfiles_data[i].read = get_read_bamfile(bamfiles_data[i].b, bamfiles_data[i].hdr, bamfiles_data[i].read, reflist->tid_map, reflist->n_tid);
                                 bamfiles_data[i].read->sampleid = i;
                         }
                         else
@@ -182,7 +203,7 @@ int init_bamfiles(struct BAMFILE_data* bamfiles_data,char** bamfilelist,int bamf
                         if ( (bamfiles_data[i].ret = sam_itr_next(bamfiles_data[i].fp, bamfiles_data[i].iter, bamfiles_data[i].b)) >=0)
                         {
                                 if (i==0 || i+1 == bamfiles) fprintf(stderr,"reading bam/cram file index: %s region %d:%d-%d\n",bamfilelist[i],ref,beg,end);
-                                bamfiles_data[i].read = get_read_bamfile(bamfiles_data[i].b, bamfiles_data[i].hdr, bamfiles_data[i].read);
+                                bamfiles_data[i].read = get_read_bamfile(bamfiles_data[i].b, bamfiles_data[i].hdr, bamfiles_data[i].read, reflist->tid_map, reflist->n_tid);
                                 bamfiles_data[i].read->sampleid = i;
 
                         }

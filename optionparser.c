@@ -73,8 +73,9 @@ int parse_arguments(int argc,char* argv[],struct OPTIONS* options,char* bamfilep
 			else fprintf(stderr,"overlapping paired-end reads will NOT be detected, use \"--OPE 1\" option to detect overlapping paired-end reads\n");
 		}
 		else if (strcmp(argv[i],"--refbias") ==0) AGILENT_REF_BIAS = atof(argv[i+1]); 
-		else if (strcmp(argv[i],"--useduplicates") ==0) USE_DUPLICATES = atoi(argv[i+1]); 
-		else if (strcmp(argv[i],"--fastfilter") ==0) FAST_FILTER = atoi(argv[i+1]); 
+		else if (strcmp(argv[i],"--useduplicates") ==0) USE_DUPLICATES = atoi(argv[i+1]);
+		else if (strcmp(argv[i],"--fastfilter") ==0) FAST_FILTER = atoi(argv[i+1]);
+		else if (strcmp(argv[i],"--sm") ==0) options->use_rg_sm = atoi(argv[i+1]);
 		else if (strcmp(argv[i],"--sse") ==0) CALCULATE_ERROR_RATES = atoi(argv[i+1]);  // allele counts for each sample to calculate context specific error rates 
 		else if (strcmp(argv[i],"--outputAC") ==0) OUTPUT_ALLELE_COUNTS = argv[i+1];  // allele counts for each sample at indel sites will be output to the file specified
 
@@ -233,7 +234,7 @@ int optparser(int argc, char* argv[],struct OPTIONS* options)
 	strcpy(options->fastafile,"None"); strcpy(options->bedfile,"None"); strcpy(options->vcffile,"None");
 	strcpy(options->indelfile,"None");
 	options->bamfiles =0; options->READLENGTH = 0; options->varpoolsize = 0; // variable pool size 0/1
-	options->regions = NULL; options->samples =0; options->bamfiles =0;
+	options->regions = NULL; options->samples =0; options->bamfiles =0; options->use_rg_sm = 0;
 	//else if (strcmp(argv[i],"--variantcallingmodel")==0 || strcmp(argv[i],"--model") == 0) PICALL = atoi(argv[i+1]); 
 	// picall = 0 = pooled, picall = 1 = picall, picall = 2 = lowcoverage
 	if (argc >= 2 && (strcmp(argv[1],"-h") ==0 || strcmp(argv[1],"--help") ==0))   

@@ -88,7 +88,7 @@ void free_read_queue(READQUEUE* RQ,struct BAMFILE_data* bamfiles_data); //free r
 
 void empty_queue(READQUEUE* bq,struct BAMFILE_data* bamfiles_data);
 
-int init_bamfiles(struct BAMFILE_data* bamfiles_data,char** bamfilelist,int bamfiles,char* regions,int* ref,int* start,int* end,char* reference_fasta);
+int init_bamfiles(struct BAMFILE_data* bamfiles_data,char** bamfilelist,int bamfiles,char* regions,int* ref,int* start,int* end,char* reference_fasta,REFLIST* reflist);
 
 //void free_read(struct alignedread* read);
 

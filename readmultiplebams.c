@@ -91,7 +91,7 @@ int multisampleVC(struct OPTIONS* options,REFLIST* reflist,FILE* fp)
 	
 	reflist->cinterval = -1; // first interval to the right of current base
 
-        init_bamfiles(bamfiles_data,options->bamfilelist,bamfiles,options->regions,&options->targettid,&options->targetstart,&options->targetend,options->fastafile);
+        init_bamfiles(bamfiles_data,options->bamfilelist,bamfiles,options->regions,&options->targettid,&options->targetstart,&options->targetend,options->fastafile,reflist);
 
 	// error when reading indexed bam files probably due to lack of reads in some files resulting in heap error, fixed oct 17 2012
         j=0; for (i=0;i<bamfiles;i++) 
@@ -198,7 +198,7 @@ int multisampleVC(struct OPTIONS* options,REFLIST* reflist,FILE* fp)
 		else rf = sam_itr_next(bamfiles_data[i].fp, bamfiles_data[i].iter, bamfiles_data[i].b);
 		if (rf >=0)
 		{
-			bamfiles_data[i].read = get_read_bamfile(bamfiles_data[i].b, bamfiles_data[i].hdr, pread); 
+			bamfiles_data[i].read = get_read_bamfile(bamfiles_data[i].b, bamfiles_data[i].hdr, pread, reflist->tid_map, reflist->n_tid);
 			//if (options->samples ==0) bamfiles_data[i].read->sampleid = i;
 			//else bamfiles_data[i].read->sampleid = options->BAM_TO_SAMPLE[i];  
 			// bug here june 30 2013 commented out .... in 12 T2D pools 
@@ -245,6 +245,38 @@ int multisampleVC(struct OPTIONS* options,REFLIST* reflist,FILE* fp)
 }
 
 
+static void fill_sampleids_from_rg_sm(struct OPTIONS* options)
+{
+	int i=0,t=0,n=0;
+	if (options->sampleids == NULL)
+		options->sampleids = (char**)calloc(options->bamfiles, sizeof(char*));
+	for (i=0;i<options->bamfiles;i++)
+	{
+		htsFile* f = hts_open(options->bamfilelist[i], "r");
+		if (f == NULL) { fprintf(stderr,"warning: could not open %s to read @RG SM\n",options->bamfilelist[i]); continue; }
+		sam_hdr_t* hdr = sam_hdr_read(f);
+		if (hdr == NULL) { hts_close(f); continue; }
+		n = sam_hdr_count_lines(hdr, "RG");
+		if (n <= 0) { fprintf(stderr,"warning: no @RG lines in %s, using filename for sample name\n",options->bamfilelist[i]); sam_hdr_destroy(hdr); hts_close(f); continue; }
+		kstring_t sm = {0,0,NULL};
+		if (sam_hdr_find_tag_pos(hdr, "RG", 0, "SM", &sm) != 0 || sm.s == NULL)
+		{
+			fprintf(stderr,"warning: no SM tag in @RG of %s, using filename for sample name\n",options->bamfilelist[i]);
+			ks_free(&sm); sam_hdr_destroy(hdr); hts_close(f); continue;
+		}
+		options->sampleids[i] = strdup(sm.s);
+		// warn if any other @RG line has a different SM
+		for (t=1;t<n;t++)
+		{
+			kstring_t sm2 = {0,0,NULL};
+			if (sam_hdr_find_tag_pos(hdr,"RG",t,"SM",&sm2) == 0 && sm2.s != NULL && strcmp(sm.s,sm2.s) != 0)
+				fprintf(stderr,"warning: %s has multiple SM values ('%s','%s'), using first\n",options->bamfilelist[i],sm.s,sm2.s);
+			ks_free(&sm2);
+		}
+		ks_free(&sm); sam_hdr_destroy(hdr); hts_close(f);
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	//fprintf(stderr,"size of indel element %d \n",sizeof(struct VCF_ALLELE));
@@ -266,7 +298,9 @@ int main(int argc, char* argv[])
 	// open indel file with candidate indels 
 	if (strcmp(options->indelfile,"None") !=0) options->fp_indelfile = fopen(options->indelfile,"w"); else options->fp_indelfile = NULL;
 
-	// print VCF to stdout as well if no VCFfile is specified 
+	if (options->use_rg_sm) fill_sampleids_from_rg_sm(options);
+
+	// print VCF to stdout as well if no VCFfile is specified
 	if (options->vfile != NULL && strcmp(options->vcffile,"None") !=0)
 	{
 		vflag =1; print_crispheader(options);

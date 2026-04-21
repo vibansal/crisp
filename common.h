@@ -56,6 +56,7 @@ struct OPTIONS
 	char indelfile[1024]; FILE* fp_indelfile; // VCF file with indel candidates 
 	int *ploidy; int varpoolsize;
 	int* phenotypes; int association; // 0/1/2 for each pool to do case control association testing
+	int use_rg_sm; // 1 = use @RG SM tag from BAM/CRAM header for VCF sample names
 
 };
 

@@ -43,7 +43,7 @@ struct alignedread
 
 };
 
-struct alignedread* get_read_bamfile(const bam1_t *b, sam_hdr_t *hdr, struct alignedread* read);
+struct alignedread* get_read_bamfile(const bam1_t *b, sam_hdr_t *hdr, struct alignedread* read, int* tid_map, int n_tid);
 
 int parse_cigar(struct alignedread* read,REFLIST* reflist,int current,int* fcigarlist);//int sample_id);
 

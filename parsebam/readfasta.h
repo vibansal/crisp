@@ -23,10 +23,12 @@ typedef struct
 	int current; int* lookup; // current variable added for indexing into REFLIST// july 20 2011
 	char fastafile[1024]; // name of fasta file
 
-	INTERVAL* intervallist; int intervals; 
+	INTERVAL* intervallist; int intervals;
 	int* first_interval_chrom; // index to first interval for each chromosome in interval list
 	int cinterval; // current interval that is closest to the current base being examined for variant calling
-	
+
+	int* tid_map; int n_tid; // maps BAM/CRAM tid -> reflist index, built by name from BAM header in init_bamfiles
+
 } REFLIST;
 
 
