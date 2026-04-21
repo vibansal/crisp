@@ -1,110 +1,125 @@
-################################################################################################
-
-CRISP: Comprehensive Read Analysis for Identification of SNVs (and short indels) from Pooled sequencing data
+# CRISP: Comprehensive Read Analysis for Identification of SNVs (and short indels) from Pooled sequencing data
 
 Contact: Vikas Bansal, vibansal@ucsd.edu
 
-Citation: 
+---
 
-A statistical method for the detection of variants from next-generation resequencing of DNA pools, V. Bansal. Bioinformatics 26(12), 2010
+## Introduction
 
-Efficient and Cost Effective Population Resequencing by Pooling and In-Solution Hybridization. V. Bansal et al. PloS ONE 2011. 
-
-
-#################################################################################################
-
-Introduction:
-=============
-
-CRISP is a software program to detect SNPs and short indels from pooled sequencing data. CRISP is designed to detect both rare and common variants by utilizing sequence reads from next-generation sequencing of multiple DNA pools. CRISP uses a cross-pool comparison approach to distinguish sequencing errors from rare variants. Note that the method is not designed for variant detection from a single pool. CRISP has been evaluated on several pooled sequencing datasets (human and bacterial) generated using the Illumina sequencing platform. In principle, it should work for sequence data from other sequencing platforms. The method requires each pool to be sequenced using the same sequencing platform. 
+CRISP is a software program to detect SNPs and short indels from pooled sequencing data. CRISP is designed to detect both rare and common variants by utilizing sequence reads from next-generation sequencing of multiple DNA pools. CRISP uses a cross-pool comparison approach to distinguish sequencing errors from rare variants. Note that the method is not designed for variant detection from a single pool. CRISP has been evaluated on several pooled sequencing datasets (human and bacterial) generated using the Illumina sequencing platform. In principle, it should work for sequence data from other sequencing platforms. The method requires each pool to be sequenced using the same sequencing platform.
 
 
+## Installation
 
-Installation
-=============
+CRISP is implemented in C and uses **htslib** for reading BAM and CRAM files. Install htslib before compiling:
 
-CRISP is implemented in C and uses the SAMtools API for reading BAM files. The source code for samtools is included in the source code (subdirectory samtools). Samtools requires certain libraries (libncurses-dev) to compile. Typing "make all" should compile both samtools and the CRISP source code. The compiled executable 'CRISP.binary' should be in the 'bin' subfolder. CRISP has been tested on Debian & Ubuntu Linux.  
+- **Debian/Ubuntu**: `sudo apt-get install libhts-dev`
+- **macOS (Homebrew)**: `brew install htslib`
+- **From source**: https://github.com/samtools/htslib
 
+The reference FASTA must be indexed with `samtools faidx` (or equivalent) before running CRISP.
 
-Running CRISP:
-=============
-
-
-The first step is to align the reads from the sequencing experiment to the reference genome using BWA (or your favorite aligner) and generate sorted BAM file for each pool. To improve detection of indels, it is recommended to run an indel realigner program (such as GATK) to realign reads and generate a realigned BAM file. Once a single bam file for each pool is generated, CRISP can be run on the BAM files to detect variants by comparing against a reference sequence. 
-
-./CRISP [options] --bams file_bam_paths --ref reference.fasta --VCF variantcalls.VCF --poolsize poolsize --bed targets.bed > variantcalls.log
+Once htslib is installed, type `make` in the source directory. The compiled executable `CRISP.binary` will be in the `bin/` subfolder. CRISP has been tested on Debian & Ubuntu Linux.
 
 
-***Important Notes:***
+## Running CRISP
 
-1. CRISP requires at least four arguments: poolsize, reference fasta file, bamfiles and the output VCF file
-2. BAM files can be specified in two ways: 
-	(a) --bams: list of all bam files in a single text file
-	(b) --bam: specify individual bam files on the command line 
-3. The reference sequence file should be indexed using 'samtools faidx' and the index file reference.fasta.fai placed in the same directory as reference.fasta
-4. For targeted sequencing studies, it is recommended to use a bed file for variant calling. If a bedfile is not specified, the program will evaluate each base in the genome for variant calling.
+The first step is to align the reads from the sequencing experiment to the reference genome (using BWA or similar) and generate a sorted, indexed BAM or CRAM file for each pool. To improve detection of indels, it is recommended to run an indel realigner (such as GATK) to realign reads. Once a single BAM or CRAM file per pool is ready, CRISP can be run to detect variants.
 
-4. CRISP requires at least two pools to make variant calls, but at least 5 pools are recommended. CRISP should be run separately on pools sequenced on different sequencing instruments.
+```
+./CRISP [options] --bams file_bam_paths --ref reference.fasta --VCF variantcalls.VCF -p poolsize --bed targets.bed > variantcalls.log
+```
 
-5. The number of haplotypes in each pool (--poolsize) is assumed to be the same. For variable poolsizes, the poolsize should be specified inn the input file with the list of bam files (see FAQ for details on the format).
-   
-6. CRISP can be parallelized by calling variants on specific chromosomes (or regions) using the --regions option. This requires the bam files to be indexed. 
+**Important Notes:**
 
-
-Command-line arguments for CRISP
-================================
-
-         --bams         textfile with list of bam file paths (one for each pool)
-         --bam          bam file for one pool, specify filename for each pool using --bam pool1.bam --bam pool2.bam .... --bam pooln.bam
-         --ref       	Indexed Reference Sequence file (fasta)
-	 --bed		bedfile with intervals in which variants will be called
-         --poolsize     poolsize (number of haploid genomes in each pool), for diploid genomes: 2 x # individuals
-         --VCF       	VCF file to which the variant calls will be output 
-         --qvoffset  	quality value offset, 33 for Sanger format, 64 for Illumina 1.3+ format
-         --mbq       	minimum base quality to consider a base for variant calling, default 10
-         --mmq       	minimum read mapping quality to consider a read for variant calling, default 20
-         --regions      region(s) in which variants will be called, e.g chr1:654432-763332. BAM files should be indexed for this option with the index file pooln.bam.bai 
-         --minc      	minimum number of reads with alternate allele required for calling a variant, default 4
-         --ctpval    	threshold on the contingency table p-value for calling position as variant (specified as log10), default is -3.5, increase this threshold as number of pools increases
-         --qvpval    	threshold on the quality values based p-value for calling position as variant (specified as log10), default is -5
-         --perms     	maximum number of permutations for calculating contingency table p-value, default 20,000
-	 --filterreads  filter reads with excessive number of mismatches (and gaps) compared to the reference sequence, Default is 1. Set to 0 to disable filtering 
+1. CRISP requires at least four arguments: poolsize (`-p`), reference FASTA (`--ref`), BAM/CRAM file list (`--bams`), and output VCF (`--VCF`).
+2. Both BAM and CRAM input files are supported. **CRAM files require `--ref`** to specify the reference FASTA used during alignment.
+3. BAM/CRAM files can be specified in two ways:
+   - `--bams`: a text file with one BAM/CRAM path per line
+   - `--bam`: specify individual files on the command line: `--bam pool1.bam --bam pool2.bam ...`
+4. The reference FASTA must be indexed (`samtools faidx reference.fasta`); the `.fai` index must be in the same directory. CRISP validates that contig names and lengths in the BAM/CRAM header match the reference FASTA.
+5. For targeted sequencing studies, use `--bed` to restrict variant calling to target regions. Without a bed file, every position in the genome is evaluated (large output).
+6. CRISP requires at least two pools to make variant calls; at least 5 pools are recommended. Run CRISP separately for pools sequenced on different instruments.
+7. The number of haplotypes per pool (`--poolsize`) is assumed to be the same across pools. For variable pool sizes, specify the pool size per file in the `--bams` input file (see FAQ).
+8. CRISP can be parallelized by chromosome/region using `--regions`. BAM/CRAM files must be indexed (`.bam.bai` / `.cram.crai`).
 
 
+## Command-line arguments
 
-Output VCF file:
-================
-
-CRISP outputs the variants identified to a VCF file. For each variant, CRISP outputs the allele depth (read counts) for the reference and variant alleles at each poisition in the VCF file. This can be used for calculating allele frequencies or doing case-control association analysis. Multi-allelic variants and indels are also reported.
-
-Update: the latest version of CRISP outputs genotypes for each pool (--EM 1, default) as allele counts. The CRISP VCF can be converted to a standard pooled genotype VCF using a script provided in the scripts sub-directory. 
-
-Description of fields
-=====================
-
-NP: Number of Pools With Data
-VP: Number of Pools with variant allele(s)
-DP: Total number of reads (+strand,-strand) across all pools (filtered reads only)
-CT: contingency table p-value for each variant allele in same order as listed in column 5
-QVpf (QVpr): quality values based p-value for each variant allele using forward(reverse) strand reads 
-MQ: number of reads with mapping qualities <10 | 10-19 |  20-39 |  >=40 
-VT: variant type, SNV | DELETION | INSERTION 
-HP: length in the ambiguity of positioning of indels (homopolymer length or microsatellite length)
-FLANKSEQ: This represents the reference haplotype sequence (length spans the homopolymer or microsatellite tract) with 10 bases either side of the variant position (10bases_upstream:reference_haplotype_sequence:10bases_downstream). This is useful to eyeball indels that occur in long homopolymer or microsatellite tracts.
-
-SB: variant demonstrates strand bias
-PASS: variant passes all filters 
-
-AF: frequency of variant alleles(s) in the pool in order listed in column 5
-ADf: Number of reads aligned to the forward strand of the genome supporting reference allele and the alternate alleles in the order listed
-ADr: Number of reads aligned to the reverse strand of the genome supporting reference allele and the alternate alleles in the order listed
-
-Please note that some of these fields may be removed/updated in future releases. 
+```
+--bams                  textfile with list of BAM/CRAM file paths (one per pool)
+--bam                   BAM/CRAM file for one pool; repeat for each pool: --bam pool1.bam --bam pool2.bam ...
+--ref / --reference     indexed reference FASTA file (required; mandatory for CRAM input)
+--bed / --bedfile       BED file with intervals for variant calling
+-p / --poolsize         poolsize (number of haploid genomes per pool); for diploid samples: 2 × number of individuals
+--VCF                   output VCF file for variant calls
+--sm <0/1>              use @RG SM tag from BAM/CRAM header as VCF sample name (default 0: derive from filename)
+--mbq <int>             minimum base quality for variant calling, default 10
+--mmq <int>             minimum read mapping quality for variant calling, default 20
+--regions               region for variant calling, e.g. chr1:654432-763332 (requires indexed BAM/CRAM)
+--minc <int>            minimum reads with alternate allele required to call a variant, default 4
+--ctpval <float>        contingency table p-value threshold (log10), default -3.5; increase as pool count grows
+--filterreads <0/1>     filter reads with excessive mismatches vs reference, default 1 (set 0 to disable)
+--EM <0/1>              genotype calling method: 1 = EM algorithm (default), 0 = allele frequency method
+--OPE <0/1>             identify overlapping paired-end reads, treat as single read in overlap, default 1
+--mincov <int>          minimum average coverage per haploid genome to call variants at a site
+--flankingbases <int>   call variants in regions flanking bed targets (use 50–100 for targeted sequencing), default 0
+--verbose / --pflag <0/1/2>   output verbosity: 0 = none, 1 = medium (default), 2 = detailed
+```
 
 
+## Output VCF file
+
+CRISP outputs variants to a VCF file. For each variant, allele depths (read counts) for the reference and variant alleles are reported per pool/sample. Multi-allelic variants and indels are included.
+
+The default output (`--EM 1`) reports pool genotypes as allele counts. A script in the `scripts/` subdirectory converts the CRISP VCF to standard pooled genotype VCF format.
 
 
+## INFO fields
+
+| Field | Description |
+|-------|-------------|
+| NP | Number of pools with data at this position |
+| VP | Number of pools with the variant allele(s) |
+| DP | Total read counts (+strand, -strand, bidirectional) across all pools (filtered reads only) |
+| CT | Contingency table p-value (log10) for each variant allele, in the order listed in ALT |
+| AC | Estimated allele count (across all pools) for each variant allele |
+| AF | Estimated allele frequency (EM algorithm) for each variant allele |
+| VT | Variant type: SNV, DELETION, or INSERTION |
+| VF | EMpass or EMfail; EMfail variants should be discarded |
+| EMstats | Log-likelihood statistics from the EM algorithm |
+| HWEstats | Hardy-Weinberg equilibrium p-value across all pools |
+| MQS | Read counts by mapping quality bin: 0–9, 10–19, 20–39, 40–255 |
+| HP | Homopolymer run length (or microsatellite length) at the variant position; indicates ambiguity in indel positioning |
+| FLANKSEQ | Flanking sequence context — 10 bases upstream : reference haplotype : 10 bases downstream. Useful for inspecting indels in repetitive sequence. |
 
 
+## FORMAT fields
+
+| Field | Description |
+|-------|-------------|
+| GT | Genotype |
+| DP | Read depth per pool/sample (all reads) |
+| GQ | Genotype quality |
+| AC | Maximum-likelihood allele count estimate for ALT allele(s), per pool |
+| AF | Variant allele frequency in pool |
+| ADf | Forward-strand read counts supporting REF and each ALT allele |
+| ADr | Reverse-strand read counts supporting REF and each ALT allele |
+| ADb | Overlapping paired-end read counts supporting REF and each ALT allele |
 
 
+## FILTER values
+
+| Value | Description |
+|-------|-------------|
+| PASS | Variant passes all filters |
+| StrandBias | Strand bias in read distribution between REF and ALT alleles |
+| LowDepth | Low average coverage (< 1 filtered read per haplotype across all samples) |
+| LowMQ20 | > 20% of reads have mapping quality < 20 |
+| LowMQ10 | > 10% of reads have mapping quality < 20 |
+
+
+## References
+
+- V. Bansal. A statistical method for the detection of variants from next-generation resequencing of DNA pools. *Bioinformatics* 26(12), 2010.
+- V. Bansal et al. Efficient and Cost Effective Population Resequencing by Pooling and In-Solution Hybridization. *PLoS ONE*, 2011.

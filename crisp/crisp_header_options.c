@@ -71,49 +71,43 @@ void print_crispheader(struct OPTIONS* options)
 
 void print_crispoptions()
 {
-	fprintf(stderr,"\nCRISP: statistical method to identify SNVs and indels from pooled DNA sequencing data (requires multiple samples (pools), ideally >=5 samples)\n\n Please provide a bed-file for calling variants on human samples to avoid large output files\n\n");
-	fprintf(stderr,"./CRISP [options] --bams file_bam_paths --ref reference.fasta --VCF variantcalls.VCF -p poolsize > variantcalls.log\n\n");
+	fprintf(stderr,"\nCRISP: statistical method to identify SNVs and indels from pooled DNA sequencing data (requires multiple pools/samples, ideally >=5)\n\n Please provide a bed-file for calling variants on human samples to avoid large output files\n\n");
+	fprintf(stderr,"./CRISP [options] --bams file_bam_paths --ref reference.fasta --VCF variantcalls.VCF -p poolsize --bed targets.bed > variantcalls.log\n\n");
 	fprintf(stderr,"Options:\n");
-	fprintf(stderr,"         --bams         	textfile with list of bam file paths (one for each pool)\n");
-	fprintf(stderr,"         --bam          	bam file for one pool, specify file for each pool using --bam pool1.bam --bam pool2.bam .... --bam pooln.bam\n");
-	fprintf(stderr,"         --ref       		Indexed Reference Sequence file (fasta)\n");
-	fprintf(stderr,"         --bed       		bed file for list of regions in which variants should be called (format is chrom start end on each line)\n");
-	fprintf(stderr,"         -p/--poolsize <int>    poolsize (number of haploid genomes in each pool), for diploid genomes: 2 x # individuals\n");
-	fprintf(stderr,"         --VCF       		VCF file to which the variant calls will be output \n");
-	fprintf(stderr,"         --qvoffset <int> 	quality value offset, 33 is default\n");
-	// change this to --phred33 or phred 64 
-	fprintf(stderr,"         --mbq     <int>  	minimum base quality to consider a base for variant calling, default 10\n");
-	fprintf(stderr,"         --mmq     <int>  	minimum read mapping quality to consider a read for variant calling, default 20\n");
-	fprintf(stderr,"         --regions      	region(s) in which variants will be called, e.g chr1:654432-763332. BAM files should be indexed for using this option.\n");
-	fprintf(stderr,"         --minc    <int>  	minimum number of reads with alternate allele required for calling a variant, default 4\n");
-	fprintf(stderr,"         --ctpval  <float> 	threshold on the contingency table p-value for calling position as variant (specified as log10), default is -3.5\n");
-	fprintf(stderr,"         --qvpval  <float> 	threshold on the quality values based p-value for calling position as variant (specified as log10), default is -5\n");
-	fprintf(stderr,"         --perms   <int> 	maximum number of permutations for calculating contingency table p-value, default 20000\n");
-	fprintf(stderr,"         --filterreads <0/1>	filter reads with excessive number of mismatches (and gaps) compared to the reference sequence, default is 1. Set to 0 to disable filtering\n");
-	fprintf(stderr,"         --verbose  <0/1/2> 	amount of information to output to log file, 0: no output, 1: medium (default), 2: detailed\n");
-	fprintf(stderr,"         --OPE  <0/1> 		identify overlapping paired-end reads and treat as single read in the overlapping region, default is 1, set to 0 to disable this (can be slow for high-coverage datasets)\n");
-	fprintf(stderr,"         --refbias  <float> 	reference allele bias for targeted sequencing data, default is 0.5, use 0.52-0.54 for Agilent SureSelect targeted sequencing experiments\n");
-	fprintf(stderr,"	 --EM		<0/1>	0 = old CRISP method with allele frequencies, 1 = EM algorithm will be used for estimating pooled genotypes and calling variants, default is 1\n");
-	fprintf(stderr,"	 --flankingbases <int>	call variants in regions that flank target regions in bed file, use 50 or 100 for targeted sequencing, default value is 0 \n");
-
-	//fprintf(stderr,"         --seqerate  	estimate of average sequencing error rate. Default value is -1 which uses individual base qualities to estimate p-values\n");
-	//fprintf(stderr,"         --maxm      	maximum number of mismatches allowed in a read to be considered for variant calling (program automatically calculates this based on readlength) set to -1 to disable filtering\n");
+	fprintf(stderr,"         --bams         \ttextfile with list of BAM/CRAM file paths (one per pool)\n");
+	fprintf(stderr,"         --bam          \tBAM/CRAM file for one pool; repeat for each pool: --bam pool1.bam --bam pool2.bam ...\n");
+	fprintf(stderr,"         --ref          \tindexed reference FASTA file (required; mandatory for CRAM input)\n");
+	fprintf(stderr,"         --bed          \tBED file with intervals for variant calling (chrom start end per line)\n");
+	fprintf(stderr,"         -p/--poolsize <int>\tpoolsize (number of haploid genomes per pool); for diploid: 2 x number of individuals\n");
+	fprintf(stderr,"         --VCF          \toutput VCF file for variant calls\n");
+	fprintf(stderr,"         --sm <0/1>     \tuse @RG SM tag from BAM/CRAM header as VCF sample name (default 0: derive from filename)\n");
+	fprintf(stderr,"         --qvoffset <int>\tquality value offset: 33 (Sanger, default) or 64 (Illumina 1.3+)\n");
+	fprintf(stderr,"         --mbq <int>    \tminimum base quality for variant calling, default 10\n");
+	fprintf(stderr,"         --mmq <int>    \tminimum read mapping quality for variant calling, default 20\n");
+	fprintf(stderr,"         --regions      \tregion for variant calling, e.g. chr1:654432-763332 (requires indexed BAM/CRAM)\n");
+	fprintf(stderr,"         --minc <int>   \tminimum reads with alternate allele to call a variant, default 4\n");
+	fprintf(stderr,"         --ctpval <float>\tcontingency table p-value threshold (log10), default -3.5; increase as pool count grows\n");
+	fprintf(stderr,"         --perms <int>  \tmaximum permutations for contingency table p-value, default 20000\n");
+	fprintf(stderr,"         --filterreads <0/1>\tfilter reads with excessive mismatches vs reference, default 1 (0 to disable)\n");
+	fprintf(stderr,"         --verbose <0/1/2>\tlog verbosity: 0 = none, 1 = medium (default), 2 = detailed\n");
+	fprintf(stderr,"         --OPE <0/1>    \tidentify overlapping paired-end reads, treat as single read in overlap, default 1\n");
+	fprintf(stderr,"         --refbias <float>\treference allele bias for targeted sequencing, default 0.5 (use 0.52-0.54 for Agilent SureSelect)\n");
+	fprintf(stderr,"         --EM <0/1>     \t0 = allele frequency method, 1 = EM algorithm for pooled genotype calling (default)\n");
+	fprintf(stderr,"         --mincov <int> \tminimum average coverage per haploid genome to call variants at a site\n");
+	fprintf(stderr,"         --flankingbases <int>\tcall variants in flanking regions around bed targets (use 50-100 for targeted sequencing), default 0\n");
 
 	fprintf(stderr,"\nNotes:\n\n");
-	fprintf(stderr," 1. CRISP requires poolsize and reference fasta file for making variant calls\n");
-	fprintf(stderr," 2. CRISP requires at least two pools to make variant calls, but at least 5 pools are ideal\n");
-	fprintf(stderr," 3. The reference sequence file should be indexed using 'samtools faidx' or a similar program and placed in same directory as fasta file with extension .fai\n");
-	fprintf(stderr," 4. The ploidy of each pool is assumed to be the same, see the FAQ file for how to specify variable ploidy for each pool\n");
-	fprintf(stderr," 5. For human re-sequencing, if a bedfile is not specified, the program will evaluate each base for variant calling and the output log file can be huge\n");
-	fprintf(stderr," 6. Please make sure that the reference sequence file is the same as the one used to align the reads in the BAM files and that the BAM files are coordinate sorted\n");
-	fprintf(stderr," 7. For indel analysis, CRISP assumes that indels are left justified, --leftalign 1 option can be used to left justify gaps in aligned reads\n");
-	fprintf(stderr," 8. the program uses the samtools API for reading bam files \n");
-	fprintf(stderr," 9. BAM files should be indexed in order to use the --regions option with the indexed bam file as pooln.bam.bai\n\n");
-        fprintf(stderr," 10. The aligned reads for each pool should be in a single bam file that is sorted by chromosomal coordinates\n");
-        //fprintf(stderr," 11. The ctpval and qvpval thresholds are only used with EM = 0 option (older version of CRISP)\n");
-
-	//fprintf(stderr," 11. The bed file can be used to re-call variants at specified positions in the genome\n\n");
-	//fprintf(stderr," 7. The value of the parameter --maxm should be choosen based on average length of reads (3 for < 75-bp reads, 4 for < 100 bp reads...)\n\n");
+	fprintf(stderr," 1. CRISP requires poolsize (-p), reference FASTA (--ref), BAM/CRAM file list (--bams), and output VCF (--VCF)\n");
+	fprintf(stderr," 2. Both BAM and CRAM input files are supported; CRAM files require --ref\n");
+	fprintf(stderr," 3. CRISP uses htslib for reading BAM/CRAM files (install: apt-get install libhts-dev or brew install htslib)\n");
+	fprintf(stderr," 4. The reference FASTA must be indexed (samtools faidx reference.fasta); the .fai index must be in the same directory\n");
+	fprintf(stderr," 5. CRISP validates that contig names and lengths in the BAM/CRAM header match the reference FASTA\n");
+	fprintf(stderr," 6. CRISP requires at least two pools; at least 5 pools are recommended\n");
+	fprintf(stderr," 7. Pool sizes are assumed equal across pools; variable pool sizes can be specified in the --bams input file\n");
+	fprintf(stderr," 8. For human re-sequencing, use --bed to restrict variant calling; without it, every position is evaluated\n");
+	fprintf(stderr," 9. BAM/CRAM files must be indexed for the --regions option (pooln.bam.bai or pooln.cram.crai)\n");
+	fprintf(stderr," 10. Each pool should be in a single coordinate-sorted BAM/CRAM file\n");
+	fprintf(stderr," 11. For indel calling, --leftalign 1 left-justifies gaps in aligned reads\n\n");
 
 }
 
