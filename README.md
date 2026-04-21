@@ -1,4 +1,4 @@
-# CRISP: Comprehensive Read Analysis for Identification of SNVs (and short indels) from Pooled sequencing data
+## CRISP: Comprehensive Read Analysis for Identification of SNVs (and short indels) from Pooled sequencing data
 
 Contact: Vikas Bansal, vibansal@ucsd.edu
 
