@@ -145,7 +145,7 @@ int evaluate_OPE_readpair(struct alignedread* bcall, struct alignedread* bcall_m
 		while (bcall_mate != NULL && bcall->mateposition >= bcall_mate->position) 
 		{
 			OPE_OPS++;
-			if (bcall->mateposition == bcall_mate->position && bcall->IS == -1*bcall_mate->IS && strcmp(bcall_mate->readid,bcall->readid) ==0) 
+			if (bcall_mate->matepair == NULL && bcall->mateposition == bcall_mate->position && bcall->IS == -1*bcall_mate->IS && strcmp(bcall_mate->readid,bcall->readid) ==0) 
 			{ 
 				bcall->matepair = bcall_mate; bcall_mate->matepair = bcall; 
 				bcall->lastpos_mate = bcall_mate->lastpos; bcall_mate->lastpos_mate = bcall->lastpos; 
