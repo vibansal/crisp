@@ -181,12 +181,12 @@ int callvariants(REFLIST* reflist,int current,int first,int last,READQUEUE* bq,s
 			{
 				if (reflist->cinterval >= reflist->intervals) flag=1;
 				else if (reflist->intervallist[reflist->cinterval].chrom != current) flag =1;
-				else if (k<= reflist->intervallist[reflist->cinterval].end) break;
+				else if (k< reflist->intervallist[reflist->cinterval].end) break;
 				else reflist->cinterval++; 
 			}
 			if (flag==1) break; // added 04/25/2022 to fix incorrect behavior
 
-			if (k >= reflist->intervallist[reflist->cinterval].start && k <= reflist->intervallist[reflist->cinterval].end )
+			if (k >= reflist->intervallist[reflist->cinterval].start && k < reflist->intervallist[reflist->cinterval].end )
 			{
 				//fprintf(stdout,"BED:%d-%d %d| ",reflist->intervallist[reflist->cinterval].start,reflist->intervallist[reflist->cinterval].end,reads);
 				if (reads >= HAPLOTYPES*MIN_COVERAGE_POOL || variant->ploidy[0] == 2) jointvariantcaller(reflist,current,k,bq,bamfiles_data,variant,options,0);
